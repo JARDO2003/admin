@@ -442,7 +442,7 @@
             cursor: pointer;
         }
 
-        /* Upload Zone */
+        /* Multi Upload Zone */
         .upload-zone {
             border: 2px dashed var(--gris-clair);
             border-radius: 12px;
@@ -460,7 +460,7 @@
             background: rgba(201, 169, 97, 0.05);
         }
 
-        .upload-zone.has-file {
+        .upload-zone.has-files {
             border-color: var(--vert-success);
             background: rgba(76, 175, 80, 0.05);
         }
@@ -494,28 +494,57 @@
             cursor: pointer;
         }
 
+        /* Preview Gallery */
         .preview-container {
-            display: none;
             margin-top: 30px;
         }
 
-        .preview-container.active {
-            display: block;
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-title {
+            color: var(--doré);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .preview-count {
+            background: var(--doré);
+            color: var(--noir-profond);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
         }
 
         .preview-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
-            margin-top: 20px;
         }
 
         .preview-item {
             position: relative;
-            aspect-ratio: 16/10;
+            aspect-ratio: 4/3;
             border-radius: 8px;
             overflow: hidden;
             border: 2px solid var(--gris-clair);
+            transition: all 0.3s;
+            cursor: grab;
+        }
+
+        .preview-item:hover {
+            border-color: var(--doré);
+            transform: translateY(-3px);
+        }
+
+        .preview-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
         }
 
         .preview-item img, .preview-item video {
@@ -524,12 +553,28 @@
             object-fit: cover;
         }
 
+        .preview-order {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 28px;
+            height: 28px;
+            background: var(--doré);
+            color: var(--noir-profond);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
         .preview-remove {
             position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 25px;
-            height: 25px;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
             background: var(--rouge-metallique);
             border: none;
             border-radius: 50%;
@@ -539,32 +584,87 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            transition: transform 0.2s;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+
+        .preview-item:hover .preview-remove {
+            opacity: 1;
         }
 
         .preview-remove:hover {
             transform: scale(1.1);
+            background: #a01830;
+        }
+
+        .preview-main-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--doré);
+            color: var(--noir-profond);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .drag-hint {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-container.active {
+            display: block;
         }
 
         .progress-bar {
             width: 100%;
-            height: 4px;
+            height: 6px;
             background: var(--gris-moyen);
-            border-radius: 2px;
-            margin-top: 20px;
+            border-radius: 3px;
             overflow: hidden;
-            display: none;
-        }
-
-        .progress-bar.active {
-            display: block;
         }
 
         .progress-fill {
             height: 100%;
-            background: var(--doré);
+            background: linear-gradient(90deg, var(--doré), var(--doré-clair));
             width: 0%;
             transition: width 0.3s;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--doré);
         }
 
         /* Vehicles List */
@@ -576,11 +676,12 @@
 
         .vehicle-item {
             display: grid;
-            grid-template-columns: 100px 2fr 1fr 1fr 100px;
+            grid-template-columns: 100px 2fr 1fr 1fr 120px;
             align-items: center;
             padding: 20px;
             border-bottom: 1px solid var(--gris-moyen);
             transition: background 0.3s;
+            gap: 20px;
         }
 
         .vehicle-item:hover {
@@ -753,6 +854,15 @@
             .mobile-toggle {
                 display: block !important;
             }
+
+            .vehicle-item {
+                grid-template-columns: 80px 1fr 100px;
+                gap: 15px;
+            }
+
+            .vehicle-price, .vehicle-status {
+                display: none;
+            }
         }
 
         .mobile-toggle {
@@ -820,6 +930,20 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Image counter badge */
+        .image-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--doré);
+            color: var(--noir-profond);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 2;
+        }
     </style>
 </head>
 <body>
@@ -831,11 +955,11 @@
             <form id="loginForm">
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" class="form-input" id="loginEmail" placeholder="zinzindohoue@gmail.com" required>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="admin@luxeauto.fr" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Mot de passe</label>
-                    <input type="password" class="form-input" id="loginPassword" placeholder="police" required>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="login-btn" id="loginBtn">
                     <span>Connexion</span>
@@ -962,7 +1086,7 @@
                 <div class="page-header">
                     <div>
                         <h1 class="page-title">Ajouter un véhicule</h1>
-                        <p class="page-subtitle">Créez une nouvelle fiche véhicule</p>
+                        <p class="page-subtitle">Créez une nouvelle fiche véhicule avec photos</p>
                     </div>
                 </div>
 
@@ -990,6 +1114,8 @@
                                     <option value="Aston Martin">Aston Martin</option>
                                     <option value="Rolls-Royce">Rolls-Royce</option>
                                     <option value="Maserati">Maserati</option>
+                                    <option value="McLaren">McLaren</option>
+                                    <option value="Bugatti">Bugatti</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -1041,14 +1167,11 @@
                                     <label class="checkbox-item">
                                         <input type="checkbox" id="isAvailable" checked> Disponible
                                     </label>
-                                    <label class="checkbox-item">
-                                        <input type="checkbox" id="hasVideo"> Inclure vidéo
-                                    </label>
                                 </div>
                             </div>
                             <div class="form-group full-width">
-                                <label class="form-label">Description</label>
-                                <textarea class="form-textarea" id="description" placeholder="Description détaillée du véhicule..."></textarea>
+                                <label class="form-label">Description détaillée</label>
+                                <textarea class="form-textarea" id="description" placeholder="Décrivez le véhicule, son historique, son état..."></textarea>
                             </div>
                         </div>
                     </div>
@@ -1060,27 +1183,34 @@
                                 <circle cx="8.5" cy="8.5" r="1.5"/>
                                 <polyline points="21 15 16 10 5 21"/>
                             </svg>
-                            Images et médias
+                            Galerie photos (max 10)
                         </h3>
                         
                         <div class="upload-zone" id="uploadZone">
-                            <input type="file" class="file-input" id="fileInput" multiple accept="image/*,video/*">
+                            <input type="file" class="file-input" id="fileInput" multiple accept="image/*" max="10">
                             <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                                 <polyline points="17 8 12 3 7 8"/>
                                 <line x1="12" y1="3" x2="12" y2="15"/>
                             </svg>
-                            <div class="upload-text">Glissez-déposez vos fichiers ici</div>
-                            <div class="upload-hint">ou cliquez pour parcourir (JPG, PNG, MP4)</div>
+                            <div class="upload-text">Glissez-déposez vos photos ici</div>
+                            <div class="upload-hint">ou cliquez pour parcourir (JPG, PNG - max 10 photos)</div>
                         </div>
 
-                        <div class="progress-bar" id="progressBar">
-                            <div class="progress-fill" id="progressFill"></div>
+                        <div class="progress-container" id="progressContainer">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="progress-text" id="progressText">Upload en cours... 0%</div>
                         </div>
 
-                        <div class="preview-container" id="previewContainer">
-                            <h4 style="margin-bottom: 15px; color: var(--doré);">Aperçu des fichiers</h4>
+                        <div class="preview-container hidden" id="previewContainer">
+                            <div class="preview-header">
+                                <span class="preview-title">Photos sélectionnées</span>
+                                <span class="preview-count" id="previewCount">0/10</span>
+                            </div>
                             <div class="preview-grid" id="previewGrid"></div>
+                            <p class="drag-hint">💡 Astuce : Glissez les images pour réorganiser l'ordre (la première sera l'image principale)</p>
                         </div>
                     </div>
 
@@ -1143,8 +1273,8 @@
                             <input type="email" class="form-input" value="contact@luxeauto.fr">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Téléphone</label>
-                            <input type="tel" class="form-input" value="+33 1 23 45 67 89">
+                            <label class="form-label">Téléphone WhatsApp</label>
+                            <input type="tel" class="form-input" value="0172369840">
                         </div>
                     </div>
                     <div style="margin-top: 30px;">
@@ -1160,7 +1290,7 @@
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
@@ -1235,9 +1365,9 @@
 
         window.resetForm = function() {
             document.getElementById('vehicleForm').reset();
-            document.getElementById('previewContainer').classList.remove('active');
-            document.getElementById('previewGrid').innerHTML = '';
             uploadedFiles = [];
+            updatePreview();
+            document.getElementById('year').value = new Date().getFullYear();
         };
 
         window.refreshVehicles = function() {
@@ -1258,32 +1388,10 @@
             }
         };
 
-        // Login handler
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            const spinner = document.getElementById('loginSpinner');
-            
-            btn.disabled = true;
-            spinner.classList.add('active');
-            
-            // Simulation d'authentification (à remplacer par Firebase Auth réel)
-            setTimeout(() => {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('adminContainer').classList.add('active');
-                btn.disabled = false;
-                spinner.classList.remove('active');
-                showToast('success', 'Connexion réussie', 'Bienvenue dans l\'espace administration.');
-                updateStats();
-            }, 1500);
-        });
-
-        // File upload handling
+        // File upload handling with drag & drop reorder
         let uploadedFiles = [];
         const uploadZone = document.getElementById('uploadZone');
         const fileInput = document.getElementById('fileInput');
-        const previewContainer = document.getElementById('previewContainer');
-        const previewGrid = document.getElementById('previewGrid');
 
         uploadZone.addEventListener('click', () => fileInput.click());
         
@@ -1307,91 +1415,156 @@
         });
 
         function handleFiles(files) {
-            Array.from(files).forEach(file => {
-                if (!file.type.match(/image.*|video.*/)) {
-                    showToast('error', 'Format non supporté', 'Seuls les images et vidéos sont acceptés.');
+            const remainingSlots = 10 - uploadedFiles.length;
+            const filesToAdd = Array.from(files).slice(0, remainingSlots);
+            
+            if (files.length > remainingSlots) {
+                showToast('error', 'Limite atteinte', `Vous ne pouvez ajouter que ${remainingSlots} photo(s) supplémentaire(s).`);
+            }
+            
+            filesToAdd.forEach(file => {
+                if (!file.type.startsWith('image/')) {
+                    showToast('error', 'Format invalide', `${file.name} n'est pas une image.`);
                     return;
                 }
                 
-                uploadedFiles.push(file);
-                
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const div = document.createElement('div');
-                    div.className = 'preview-item';
-                    
-                    if (file.type.startsWith('image/')) {
-                        div.innerHTML = `
-                            <img src="${e.target.result}" alt="${file.name}">
-                            <button class="preview-remove" onclick="removeFile(this, '${file.name}')">×</button>
-                        `;
-                    } else {
-                        div.innerHTML = `
-                            <video src="${e.target.result}"></video>
-                            <button class="preview-remove" onclick="removeFile(this, '${file.name}')">×</button>
-                        `;
-                    }
-                    
-                    previewGrid.appendChild(div);
+                    uploadedFiles.push({
+                        file: file,
+                        preview: e.target.result,
+                        id: Date.now() + Math.random()
+                    });
+                    updatePreview();
                 };
                 reader.readAsDataURL(file);
             });
-            
-            if (uploadedFiles.length > 0) {
-                previewContainer.classList.add('active');
-                uploadZone.classList.add('has-file');
-            }
         }
 
-        window.removeFile = function(btn, fileName) {
-            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
-            btn.parentElement.remove();
+        function updatePreview() {
+            const container = document.getElementById('previewContainer');
+            const grid = document.getElementById('previewGrid');
+            const count = document.getElementById('previewCount');
+            const zone = document.getElementById('uploadZone');
+            
+            count.textContent = `${uploadedFiles.length}/10`;
             
             if (uploadedFiles.length === 0) {
-                previewContainer.classList.remove('active');
-                uploadZone.classList.remove('has-file');
+                container.classList.add('hidden');
+                zone.classList.remove('has-files');
+                return;
             }
+            
+            container.classList.remove('hidden');
+            zone.classList.add('has-files');
+            
+            grid.innerHTML = uploadedFiles.map((item, index) => `
+                <div class="preview-item" draggable="true" data-index="${index}">
+                    <img src="${item.preview}" alt="">
+                    <div class="preview-order">${index + 1}</div>
+                    ${index === 0 ? '<div class="preview-main-badge">Principale</div>' : ''}
+                    <button type="button" class="preview-remove" onclick="removeFile(${index})">×</button>
+                </div>
+            `).join('');
+            
+            // Add drag and drop functionality
+            const items = grid.querySelectorAll('.preview-item');
+            items.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragover', handleDragOver);
+                item.addEventListener('drop', handleDrop);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+        }
+
+        let dragSrcEl = null;
+
+        function handleDragStart(e) {
+            dragSrcEl = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+            
+            if (dragSrcEl !== this) {
+                const srcIndex = parseInt(dragSrcEl.dataset.index);
+                const targetIndex = parseInt(this.dataset.index);
+                
+                // Swap files
+                const temp = uploadedFiles[srcIndex];
+                uploadedFiles[srcIndex] = uploadedFiles[targetIndex];
+                uploadedFiles[targetIndex] = temp;
+                
+                updatePreview();
+            }
+            return false;
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+        }
+
+        window.removeFile = function(index) {
+            uploadedFiles.splice(index, 1);
+            updatePreview();
         };
 
         // Form submission
         document.getElementById('vehicleForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            if (uploadedFiles.length === 0) {
+                showToast('error', 'Photos requises', 'Veuillez ajouter au moins une photo du véhicule.');
+                return;
+            }
+            
             const submitBtn = document.getElementById('submitBtn');
             const spinner = document.getElementById('submitSpinner');
-            const progressBar = document.getElementById('progressBar');
+            const progressContainer = document.getElementById('progressContainer');
             const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
             
             submitBtn.disabled = true;
             spinner.classList.add('active');
-            progressBar.classList.add('active');
+            progressContainer.classList.add('active');
             
             try {
-                // Upload files to Storage
-                const uploadPromises = uploadedFiles.map((file, index) => {
+                // Upload all images
+                const imageUrls = [];
+                const totalFiles = uploadedFiles.length;
+                
+                for (let i = 0; i < totalFiles; i++) {
+                    const file = uploadedFiles[i].file;
                     const fileRef = storageRef(storage, `vehicles/${Date.now()}_${file.name}`);
                     const uploadTask = uploadBytesResumable(fileRef, file);
                     
-                    return new Promise((resolve, reject) => {
+                    await new Promise((resolve, reject) => {
                         uploadTask.on('state_changed', 
                             (snapshot) => {
-                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                const progress = ((i + (snapshot.bytesTransferred / snapshot.totalBytes)) / totalFiles) * 100;
                                 progressFill.style.width = progress + '%';
+                                progressText.textContent = `Upload en cours... ${Math.round(progress)}%`;
                             },
                             (error) => reject(error),
                             async () => {
                                 const url = await getDownloadURL(uploadTask.snapshot.ref);
-                                resolve({ url, type: file.type });
+                                imageUrls.push(url);
+                                resolve();
                             }
                         );
                     });
-                });
+                }
                 
-                const uploadedUrls = await Promise.all(uploadPromises);
-                const imageUrl = uploadedUrls.find(u => u.type.startsWith('image/'))?.url || '';
-                const videoUrl = uploadedUrls.find(u => u.type.startsWith('video/'))?.url || '';
-                
-                // Save to Realtime Database
+                // Save to database
                 const vehicleData = {
                     brand: document.getElementById('brand').value,
                     name: document.getElementById('model').value,
@@ -1405,16 +1578,15 @@
                     premium: document.getElementById('isPremium').checked,
                     new: document.getElementById('isNew').checked,
                     available: document.getElementById('isAvailable').checked,
-                    hasVideo: !!videoUrl,
-                    imageUrl: imageUrl,
-                    videoUrl: videoUrl,
+                    images: imageUrls,
+                    imageUrl: imageUrls[0], // For backward compatibility
                     createdAt: Date.now()
                 };
                 
                 const newVehicleRef = push(ref(database, 'vehicles'));
                 await set(newVehicleRef, vehicleData);
                 
-                showToast('success', 'Véhicule publié', 'Le véhicule a été ajouté avec succès.');
+                showToast('success', 'Véhicule publié', `${vehicleData.brand} ${vehicleData.name} a été ajouté avec ${imageUrls.length} photo(s).`);
                 resetForm();
                 updateStats();
                 
@@ -1423,7 +1595,7 @@
             } finally {
                 submitBtn.disabled = false;
                 spinner.classList.remove('active');
-                progressBar.classList.remove('active');
+                progressContainer.classList.remove('active');
                 progressFill.style.width = '0%';
             }
         });
@@ -1454,7 +1626,7 @@
                     const item = document.createElement('div');
                     item.className = 'vehicle-item';
                     item.innerHTML = `
-                        <img src="${v.imageUrl || 'https://via.placeholder.com/80x60'}" class="vehicle-thumb" alt="${v.name}">
+                        <img src="${v.images?.[0] || v.imageUrl || 'https://via.placeholder.com/80x60'}" class="vehicle-thumb" alt="${v.name}">
                         <div class="vehicle-info">
                             <h4>${v.brand} ${v.name}</h4>
                             <p>${v.year} • ${v.mileage?.toLocaleString() || 0} km • ${v.fuel}</p>
@@ -1492,9 +1664,27 @@
             }, { onlyOnce: true });
         }
 
+        // Login handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const spinner = document.getElementById('loginSpinner');
+            
+            btn.disabled = true;
+            spinner.classList.add('active');
+            
+            setTimeout(() => {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('adminContainer').classList.add('active');
+                btn.disabled = false;
+                spinner.classList.remove('active');
+                showToast('success', 'Connexion réussie', 'Bienvenue dans l\'espace administration.');
+                updateStats();
+            }, 1500);
+        });
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Set current year in form
             document.getElementById('year').value = new Date().getFullYear();
         });
     </script>
