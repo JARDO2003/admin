@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Luxe Auto | Gestion des Véhicules</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --noir-profond: #0a0a0a;
+            --gris-anthracite: #1a1a1a;
+            --gris-moyen: #2d2d2d;
+            --gris-clair: #3d3d3d;
+            --blanc-pur: #ffffff;
+            --doré: #c9a961;
+            --doré-clair: #e0c78c;
+            --rouge-metallique: #c41e3a;
+            --vert-success: #4caf50;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--noir-profond);
+            color: var(--blanc-pur);
+            min-height: 100vh;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--noir-profond) 0%, var(--gris-anthracite) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .login-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .login-box {
+            background: var(--gris-anthracite);
+            padding: 60px;
+            border-radius: 12px;
+            border: 1px solid rgba(201, 169, 97, 0.3);
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--doré);
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: 0.2em;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 40px;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--doré);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            background: var(--gris-moyen);
+            border: 1px solid var(--gris-clair);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--doré);
+            box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--doré);
+            border: none;
+            color: var(--noir-profond);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            background: var(--doré-clair);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(201, 169, 97, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Admin Layout */
+        .admin-container {
+            display: none;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        .admin-container.active {
+            display: grid;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--gris-anthracite);
+            border-right: 1px solid rgba(201, 169, 97, 0.2);
+            padding: 40px 30px;
+            position: fixed;
+            height: 100vh;
+            width: 280px;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--doré);
+            margin-bottom: 50px;
+            display: block;
+            letter-spacing: 0.15em;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 15px;
+            padding-left: 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            text-align: left;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(201, 169, 97, 0.1);
+            color: var(--doré);
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            color: var(--rouge-metallique);
+        }
+
+        .logout-btn:hover {
+            background: rgba(196, 30, 58, 0.1) !important;
+            color: var(--rouge-metallique) !important;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            background: var(--noir-profond);
+            min-height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(201, 169, 97, 0.2);
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 400;
+        }
+
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+            font-size: 0.95rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--doré);
+            color: var(--noir-profond);
+        }
+
+        .btn-primary:hover {
+            background: var(--doré-clair);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(201, 169, 97, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--gris-clair);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--doré);
+            color: var(--doré);
+        }
+
+        .btn-danger {
+            background: var(--rouge-metallique);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #a01830;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--gris-anthracite);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(201, 169, 97, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(201, 169, 97, 0.3);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--doré);
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            color: var(--vert-success);
+        }
+
+        .stat-change.negative {
+            color: var(--rouge-metallique);
+        }
+
+        /* Form Sections */
+        .form-section {
+            background: var(--gris-anthracite);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(201, 169, 97, 0.1);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            color: var(--doré);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--gris-moyen);
+            border: 1px solid var(--gris-clair);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--doré);
+            box-shadow: 0 0 0 4px rgba(201, 169, 97, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--doré);
+            cursor: pointer;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--gris-clair);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: var(--gris-moyen);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--doré);
+            background: rgba(201, 169, 97, 0.05);
+        }
+
+        .upload-zone.has-file {
+            border-color: var(--vert-success);
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .upload-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            stroke: var(--doré);
+            stroke-width: 1.5;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .preview-container {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .preview-container.active {
+            display: block;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 16/10;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid var(--gris-clair);
+        }
+
+        .preview-item img, .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 25px;
+            height: 25px;
+            background: var(--rouge-metallique);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .preview-remove:hover {
+            transform: scale(1.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--gris-moyen);
+            border-radius: 2px;
+            margin-top: 20px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--doré);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Vehicles List */
+        .vehicles-list {
+            background: var(--gris-anthracite);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .vehicle-item {
+            display: grid;
+            grid-template-columns: 100px 2fr 1fr 1fr 100px;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--gris-moyen);
+            transition: background 0.3s;
+        }
+
+        .vehicle-item:hover {
+            background: rgba(201, 169, 97, 0.05);
+        }
+
+        .vehicle-thumb {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .vehicle-info h4 {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .vehicle-info p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .vehicle-price {
+            color: var(--doré);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .vehicle-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--vert-success);
+        }
+
+        .status-pending {
+            background: rgba(201, 169, 97, 0.2);
+            color: var(--doré);
+        }
+
+        .vehicle-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 6px;
+            border: none;
+            background: var(--gris-moyen);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: var(--doré);
+            color: var(--noir-profond);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--rouge-metallique);
+            color: white;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: var(--gris-anthracite);
+            border-left: 4px solid var(--doré);
+            padding: 20px 25px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            min-width: 300px;
+            animation: slideInRight 0.4s ease-out;
+            transform-origin: right;
+        }
+
+        .toast.success {
+            border-left-color: var(--vert-success);
+        }
+
+        .toast.error {
+            border-left-color: var(--rouge-metallique);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast.hide {
+            animation: slideOutRight 0.4s ease-in forwards;
+        }
+
+        @keyframes slideOutRight {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
+        }
+
+        .toast-content h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .toast-content p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                z-index: 999;
+                transition: left 0.3s;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--gris-anthracite);
+            border: 1px solid var(--doré);
+            color: var(--doré);
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--doré);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        .spinner.active {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            stroke: var(--gris-clair);
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo">LUXE AUTO</div>
+            <div class="login-subtitle">Espace Administration</div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="zinzindohoue@gmail.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="police" required>
+                </div>
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span>Connexion</span>
+                    <div class="spinner" id="loginSpinner"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Interface -->
+    <div class="admin-container" id="adminContainer">
+        <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <a href="#" class="sidebar-logo">LUXE AUTO</a>
+            
+            <div class="nav-section">
+                <div class="nav-title">Menu Principal</div>
+                <button class="nav-item active" onclick="showTab('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    Tableau de bord
+                </button>
+                <button class="nav-item" onclick="showTab('add-vehicle')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Ajouter un véhicule
+                </button>
+                <button class="nav-item" onclick="showTab('vehicles')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/>
+                    </svg>
+                    Gestion véhicules
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Paramètres</div>
+                <button class="nav-item" onclick="showTab('settings')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                    </svg>
+                    Configuration
+                </button>
+            </div>
+
+            <button class="nav-item logout-btn" onclick="logout()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m8 14l4-4m0 0l-4-4m4 4H9"/>
+                </svg>
+                Déconnexion
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Tab -->
+            <div class="tab-content active" id="dashboard-tab">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Tableau de bord</h1>
+                        <p class="page-subtitle">Vue d'ensemble de votre activité</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="showTab('add-vehicle')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            Nouveau véhicule
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Véhicules en stock</div>
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-change">+12% ce mois</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Vues ce mois</div>
+                        <div class="stat-value">12.4K</div>
+                        <div class="stat-change">+28% ce mois</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Demandes reçues</div>
+                        <div class="stat-value">48</div>
+                        <div class="stat-change">+5% ce mois</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Ventes réalisées</div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-change negative">-3% ce mois</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
+                        Activité récente
+                    </h3>
+                    <div class="vehicles-list" id="recentActivity">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M9 17v-2H4.5A2.5 2.5 0 012 12.5v-9A2.5 2.5 0 014.5 1h9A2.5 2.5 0 0116 3.5V9h-2V3.5a.5.5 0 00-.5-.5h-9a.5.5 0 00-.5.5v9a.5.5 0 00.5.5H9zm9.5 7h-9a2.5 2.5 0 01-2.5-2.5v-9a2.5 2.5 0 012.5-2.5h9a2.5 2.5 0 012.5 2.5v9a2.5 2.5 0 01-2.5 2.5z"/>
+                            </svg>
+                            <p>Aucune activité récente</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Vehicle Tab -->
+            <div class="tab-content" id="add-vehicle-tab">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Ajouter un véhicule</h1>
+                        <p class="page-subtitle">Créez une nouvelle fiche véhicule</p>
+                    </div>
+                </div>
+
+                <form id="vehicleForm">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            Informations générales
+                        </h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Marque *</label>
+                                <select class="form-select" id="brand" required>
+                                    <option value="">Sélectionner...</option>
+                                    <option value="Porsche">Porsche</option>
+                                    <option value="Mercedes-Benz">Mercedes-Benz</option>
+                                    <option value="BMW">BMW</option>
+                                    <option value="Audi">Audi</option>
+                                    <option value="Bentley">Bentley</option>
+                                    <option value="Lamborghini">Lamborghini</option>
+                                    <option value="Ferrari">Ferrari</option>
+                                    <option value="Aston Martin">Aston Martin</option>
+                                    <option value="Rolls-Royce">Rolls-Royce</option>
+                                    <option value="Maserati">Maserati</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Modèle *</label>
+                                <input type="text" class="form-input" id="model" placeholder="Ex: 911 Carrera S" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Année *</label>
+                                <input type="number" class="form-input" id="year" min="1900" max="2030" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Prix (€) *</label>
+                                <input type="number" class="form-input" id="price" placeholder="150000" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Kilométrage (km)</label>
+                                <input type="number" class="form-input" id="mileage" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Puissance (ch)</label>
+                                <input type="number" class="form-input" id="power" placeholder="450">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Carburant</label>
+                                <select class="form-select" id="fuel">
+                                    <option value="Essence">Essence</option>
+                                    <option value="Diesel">Diesel</option>
+                                    <option value="Hybride">Hybride</option>
+                                    <option value="Électrique">Électrique</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Transmission</label>
+                                <select class="form-select" id="transmission">
+                                    <option value="Automatique">Automatique</option>
+                                    <option value="Manuelle">Manuelle</option>
+                                    <option value="Semi-automatique">Semi-automatique</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Options et équipements</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="isPremium"> Premium
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="isNew"> Nouveau
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="isAvailable" checked> Disponible
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="hasVideo"> Inclure vidéo
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-textarea" id="description" placeholder="Description détaillée du véhicule..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21 15 16 10 5 21"/>
+                            </svg>
+                            Images et médias
+                        </h3>
+                        
+                        <div class="upload-zone" id="uploadZone">
+                            <input type="file" class="file-input" id="fileInput" multiple accept="image/*,video/*">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <div class="upload-text">Glissez-déposez vos fichiers ici</div>
+                            <div class="upload-hint">ou cliquez pour parcourir (JPG, PNG, MP4)</div>
+                        </div>
+
+                        <div class="progress-bar" id="progressBar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+
+                        <div class="preview-container" id="previewContainer">
+                            <h4 style="margin-bottom: 15px; color: var(--doré);">Aperçu des fichiers</h4>
+                            <div class="preview-grid" id="previewGrid"></div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">Annuler</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <span>Publier le véhicule</span>
+                            <div class="spinner" id="submitSpinner"></div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Vehicles List Tab -->
+            <div class="tab-content" id="vehicles-tab">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Gestion des véhicules</h1>
+                        <p class="page-subtitle">Gérez votre inventaire</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="refreshVehicles()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 4 23 10 17 10"/>
+                                <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+                            </svg>
+                            Actualiser
+                        </button>
+                    </div>
+                </div>
+
+                <div class="vehicles-list" id="vehiclesList">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/>
+                        </svg>
+                        <p>Chargement des véhicules...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-content" id="settings-tab">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Configuration</h1>
+                        <p class="page-subtitle">Paramètres du système</p>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3 class="section-title">Informations du site</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Nom du site</label>
+                            <input type="text" class="form-input" value="Luxe Auto">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email de contact</label>
+                            <input type="email" class="form-input" value="contact@luxeauto.fr">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Téléphone</label>
+                            <input type="tel" class="form-input" value="+33 1 23 45 67 89">
+                        </div>
+                    </div>
+                    <div style="margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="showToast('success', 'Paramètres sauvegardés', 'Les modifications ont été enregistrées.')">
+                            Sauvegarder les changements
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getDatabase, ref, push, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCPGgtXoDUycykLaTSee0S0yY0tkeJpqKI",
+            authDomain: "data-com-a94a8.firebaseapp.com",
+            databaseURL: "https://data-com-a94a8-default-rtdb.firebaseio.com",
+            projectId: "data-com-a94a8",
+            storageBucket: "data-com-a94a8.firebasestorage.app",
+            messagingSenderId: "276904640935",
+            appId: "1:276904640935:web:9cd805aeba6c34c767f682",
+            measurementId: "G-FYQCWY5G4S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
+
+        // Global functions
+        window.showToast = function(type, title, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' 
+                ? '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="#4caf50"><path d="M20 6L9 17l-5-5"/></svg>'
+                : type === 'error'
+                ? '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="#c41e3a"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+                : '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="#c9a961"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+
+            toast.innerHTML = `
+                ${icon}
+                <div class="toast-content">
+                    <h4>${title}</h4>
+                    <p>${message}</p>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        };
+
+        window.showTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'vehicles') {
+                loadVehicles();
+            }
+        };
+
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        };
+
+        window.logout = function() {
+            document.getElementById('adminContainer').classList.remove('active');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            showToast('success', 'Déconnexion', 'Vous êtes déconnecté.');
+        };
+
+        window.resetForm = function() {
+            document.getElementById('vehicleForm').reset();
+            document.getElementById('previewContainer').classList.remove('active');
+            document.getElementById('previewGrid').innerHTML = '';
+            uploadedFiles = [];
+        };
+
+        window.refreshVehicles = function() {
+            loadVehicles();
+            showToast('success', 'Actualisation', 'La liste des véhicules a été mise à jour.');
+        };
+
+        window.deleteVehicle = function(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
+                remove(ref(database, 'vehicles/' + id))
+                    .then(() => {
+                        showToast('success', 'Supprimé', 'Le véhicule a été supprimé.');
+                        loadVehicles();
+                    })
+                    .catch(error => {
+                        showToast('error', 'Erreur', error.message);
+                    });
+            }
+        };
+
+        // Login handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const spinner = document.getElementById('loginSpinner');
+            
+            btn.disabled = true;
+            spinner.classList.add('active');
+            
+            // Simulation d'authentification (à remplacer par Firebase Auth réel)
+            setTimeout(() => {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('adminContainer').classList.add('active');
+                btn.disabled = false;
+                spinner.classList.remove('active');
+                showToast('success', 'Connexion réussie', 'Bienvenue dans l\'espace administration.');
+                updateStats();
+            }, 1500);
+        });
+
+        // File upload handling
+        let uploadedFiles = [];
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewGrid = document.getElementById('previewGrid');
+
+        uploadZone.addEventListener('click', () => fileInput.click());
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (!file.type.match(/image.*|video.*/)) {
+                    showToast('error', 'Format non supporté', 'Seuls les images et vidéos sont acceptés.');
+                    return;
+                }
+                
+                uploadedFiles.push(file);
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    
+                    if (file.type.startsWith('image/')) {
+                        div.innerHTML = `
+                            <img src="${e.target.result}" alt="${file.name}">
+                            <button class="preview-remove" onclick="removeFile(this, '${file.name}')">×</button>
+                        `;
+                    } else {
+                        div.innerHTML = `
+                            <video src="${e.target.result}"></video>
+                            <button class="preview-remove" onclick="removeFile(this, '${file.name}')">×</button>
+                        `;
+                    }
+                    
+                    previewGrid.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            if (uploadedFiles.length > 0) {
+                previewContainer.classList.add('active');
+                uploadZone.classList.add('has-file');
+            }
+        }
+
+        window.removeFile = function(btn, fileName) {
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+            btn.parentElement.remove();
+            
+            if (uploadedFiles.length === 0) {
+                previewContainer.classList.remove('active');
+                uploadZone.classList.remove('has-file');
+            }
+        };
+
+        // Form submission
+        document.getElementById('vehicleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('submitSpinner');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            submitBtn.disabled = true;
+            spinner.classList.add('active');
+            progressBar.classList.add('active');
+            
+            try {
+                // Upload files to Storage
+                const uploadPromises = uploadedFiles.map((file, index) => {
+                    const fileRef = storageRef(storage, `vehicles/${Date.now()}_${file.name}`);
+                    const uploadTask = uploadBytesResumable(fileRef, file);
+                    
+                    return new Promise((resolve, reject) => {
+                        uploadTask.on('state_changed', 
+                            (snapshot) => {
+                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                progressFill.style.width = progress + '%';
+                            },
+                            (error) => reject(error),
+                            async () => {
+                                const url = await getDownloadURL(uploadTask.snapshot.ref);
+                                resolve({ url, type: file.type });
+                            }
+                        );
+                    });
+                });
+                
+                const uploadedUrls = await Promise.all(uploadPromises);
+                const imageUrl = uploadedUrls.find(u => u.type.startsWith('image/'))?.url || '';
+                const videoUrl = uploadedUrls.find(u => u.type.startsWith('video/'))?.url || '';
+                
+                // Save to Realtime Database
+                const vehicleData = {
+                    brand: document.getElementById('brand').value,
+                    name: document.getElementById('model').value,
+                    year: parseInt(document.getElementById('year').value),
+                    price: parseInt(document.getElementById('price').value),
+                    mileage: parseInt(document.getElementById('mileage').value) || 0,
+                    power: parseInt(document.getElementById('power').value) || 0,
+                    fuel: document.getElementById('fuel').value,
+                    transmission: document.getElementById('transmission').value,
+                    description: document.getElementById('description').value,
+                    premium: document.getElementById('isPremium').checked,
+                    new: document.getElementById('isNew').checked,
+                    available: document.getElementById('isAvailable').checked,
+                    hasVideo: !!videoUrl,
+                    imageUrl: imageUrl,
+                    videoUrl: videoUrl,
+                    createdAt: Date.now()
+                };
+                
+                const newVehicleRef = push(ref(database, 'vehicles'));
+                await set(newVehicleRef, vehicleData);
+                
+                showToast('success', 'Véhicule publié', 'Le véhicule a été ajouté avec succès.');
+                resetForm();
+                updateStats();
+                
+            } catch (error) {
+                showToast('error', 'Erreur', error.message);
+            } finally {
+                submitBtn.disabled = false;
+                spinner.classList.remove('active');
+                progressBar.classList.remove('active');
+                progressFill.style.width = '0%';
+            }
+        });
+
+        // Load vehicles list
+        function loadVehicles() {
+            const list = document.getElementById('vehiclesList');
+            list.innerHTML = '<div class="empty-state"><p>Chargement...</p></div>';
+            
+            onValue(ref(database, 'vehicles'), (snapshot) => {
+                const data = snapshot.val();
+                
+                if (!data) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/>
+                            </svg>
+                            <p>Aucun véhicule en stock</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                list.innerHTML = '';
+                Object.keys(data).forEach(key => {
+                    const v = data[key];
+                    const item = document.createElement('div');
+                    item.className = 'vehicle-item';
+                    item.innerHTML = `
+                        <img src="${v.imageUrl || 'https://via.placeholder.com/80x60'}" class="vehicle-thumb" alt="${v.name}">
+                        <div class="vehicle-info">
+                            <h4>${v.brand} ${v.name}</h4>
+                            <p>${v.year} • ${v.mileage?.toLocaleString() || 0} km • ${v.fuel}</p>
+                        </div>
+                        <div class="vehicle-price">${v.price?.toLocaleString('fr-FR')} €</div>
+                        <div>
+                            <span class="vehicle-status ${v.available ? 'status-active' : 'status-pending'}">
+                                ${v.available ? 'Disponible' : 'Réservé'}
+                            </span>
+                        </div>
+                        <div class="vehicle-actions">
+                            <button class="action-btn" onclick="showToast('info', 'Édition', 'Fonctionnalité à venir')" title="Modifier">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteVehicle('${key}')" title="Supprimer">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            }, { onlyOnce: true });
+        }
+
+        function updateStats() {
+            onValue(ref(database, 'vehicles'), (snapshot) => {
+                const count = snapshot.size || 0;
+                document.getElementById('statTotal').textContent = count;
+            }, { onlyOnce: true });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set current year in form
+            document.getElementById('year').value = new Date().getFullYear();
+        });
+    </script>
+</body>
+</html>
