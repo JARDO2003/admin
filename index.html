@@ -2,16 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0a0a0a">
-    <title>Admin - Luxe Auto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Luxe Auto | Gestion des Véhicules</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -26,23 +24,14 @@
             --vert-success: #4caf50;
         }
 
-        html {
-            font-size: 14px;
-        }
-
-        @media (min-width: 360px) {
-            html { font-size: 15px; }
-        }
-
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: var(--noir-profond);
             color: var(--blanc-pur);
             min-height: 100vh;
-            line-height: 1.5;
         }
 
-        /* Login Screen Mobile */
+        /* Login Screen */
         .login-screen {
             position: fixed;
             top: 0;
@@ -54,8 +43,7 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 0.4s, visibility 0.4s;
-            padding: 20px;
+            transition: opacity 0.5s, visibility 0.5s;
         }
 
         .login-screen.hidden {
@@ -65,38 +53,50 @@
 
         .login-box {
             background: var(--gris-anthracite);
-            padding: 35px 25px;
-            border-radius: 16px;
+            padding: 60px;
+            border-radius: 12px;
             border: 1px solid rgba(201, 169, 97, 0.3);
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .login-logo {
             font-family: 'Playfair Display', serif;
-            font-size: 1.6rem;
+            font-size: 2rem;
             color: var(--doré);
             text-align: center;
-            margin-bottom: 8px;
-            letter-spacing: 0.15em;
+            margin-bottom: 10px;
+            letter-spacing: 0.2em;
         }
 
         .login-subtitle {
             text-align: center;
             color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 30px;
-            font-size: 0.85rem;
+            margin-bottom: 40px;
+            font-size: 0.9rem;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 6px;
-            font-size: 0.75rem;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--doré);
@@ -104,13 +104,13 @@
 
         .form-input {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             background: var(--gris-moyen);
             border: 1px solid var(--gris-clair);
             color: white;
             font-family: 'Montserrat', sans-serif;
             font-size: 1rem;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.3s;
         }
 
@@ -122,153 +122,85 @@
 
         .login-btn {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             background: var(--doré);
             border: none;
             color: var(--noir-profond);
             font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 600;
             letter-spacing: 0.1em;
             text-transform: uppercase;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: all 0.3s;
             margin-top: 10px;
         }
 
-        .login-btn:active {
+        .login-btn:hover {
             background: var(--doré-clair);
-            transform: scale(0.98);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(201, 169, 97, 0.3);
         }
 
         .login-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
-        /* Admin Layout Mobile */
+        /* Admin Layout */
         .admin-container {
             display: none;
+            grid-template-columns: 280px 1fr;
             min-height: 100vh;
         }
 
         .admin-container.active {
-            display: block;
+            display: grid;
         }
 
-        /* Mobile Header */
-        .mobile-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: var(--gris-anthracite);
-            border-bottom: 1px solid rgba(201, 169, 97, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 15px;
-            z-index: 100;
-        }
-
-        .mobile-menu-toggle {
-            width: 40px;
-            height: 40px;
-            background: none;
-            border: none;
-            color: var(--doré);
-            font-size: 1.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .mobile-logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
-            color: var(--doré);
-            letter-spacing: 0.1em;
-        }
-
-        /* Sidebar Mobile */
+        /* Sidebar */
         .sidebar {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 80%;
-            max-width: 300px;
-            height: 100vh;
             background: var(--gris-anthracite);
             border-right: 1px solid rgba(201, 169, 97, 0.2);
-            padding: 80px 20px 20px;
-            transition: left 0.3s ease;
-            z-index: 99;
+            padding: 40px 30px;
+            position: fixed;
+            height: 100vh;
+            width: 280px;
             overflow-y: auto;
         }
 
-        .sidebar.active {
-            left: 0;
-        }
-
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-            z-index: 98;
-        }
-
-        .sidebar-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .sidebar-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 35px;
-            height: 35px;
-            background: rgba(201, 169, 97, 0.1);
-            border: 1px solid var(--doré);
-            border-radius: 50%;
+        .sidebar-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
             color: var(--doré);
-            font-size: 1.3rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin-bottom: 50px;
+            display: block;
+            letter-spacing: 0.15em;
         }
 
         .nav-section {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .nav-title {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.15em;
             color: rgba(255, 255, 255, 0.4);
-            margin-bottom: 12px;
-            padding-left: 10px;
+            margin-bottom: 15px;
+            padding-left: 15px;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 14px 12px;
+            padding: 12px 15px;
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 8px;
             transition: all 0.3s;
             margin-bottom: 5px;
             cursor: pointer;
@@ -276,12 +208,12 @@
             background: none;
             width: 100%;
             font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             text-align: left;
         }
 
         .nav-item:hover, .nav-item.active {
-            background: rgba(201, 169, 97, 0.15);
+            background: rgba(201, 169, 97, 0.1);
             color: var(--doré);
         }
 
@@ -292,72 +224,61 @@
         }
 
         .logout-btn {
-            margin-top: 20px;
+            margin-top: auto;
             color: var(--rouge-metallique);
-            background: rgba(196, 30, 58, 0.1);
         }
 
-        /* Main Content Mobile */
+        .logout-btn:hover {
+            background: rgba(196, 30, 58, 0.1) !important;
+            color: var(--rouge-metallique) !important;
+        }
+
+        /* Main Content */
         .main-content {
-            padding: 80px 15px 20px;
+            margin-left: 280px;
+            padding: 40px;
+            background: var(--noir-profond);
             min-height: 100vh;
         }
 
-        @media (min-width: 768px) {
-            .mobile-header { display: none; }
-            .sidebar {
-                position: fixed;
-                left: 0;
-                width: 260px;
-                padding: 30px 20px;
-            }
-            .sidebar-close { display: none; }
-            .sidebar-overlay { display: none; }
-            .main-content {
-                margin-left: 260px;
-                padding: 30px;
-            }
-        }
-
-        /* Page Header */
         .page-header {
-            margin-bottom: 25px;
-            padding-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
             border-bottom: 1px solid rgba(201, 169, 97, 0.2);
         }
 
         .page-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.4rem;
+            font-size: 2rem;
             font-weight: 400;
-            margin-bottom: 5px;
         }
 
         .page-subtitle {
             color: rgba(255, 255, 255, 0.6);
-            font-size: 0.85rem;
+            margin-top: 5px;
+            font-size: 0.95rem;
         }
 
         .header-actions {
-            margin-top: 15px;
             display: flex;
-            gap: 10px;
+            gap: 15px;
         }
 
         .btn {
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 12px 24px;
+            border-radius: 6px;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
             border: none;
-            flex: 1;
         }
 
         .btn-primary {
@@ -365,9 +286,10 @@
             color: var(--noir-profond);
         }
 
-        .btn-primary:active {
+        .btn-primary:hover {
             background: var(--doré-clair);
-            transform: scale(0.98);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(201, 169, 97, 0.3);
         }
 
         .btn-secondary {
@@ -376,7 +298,7 @@
             color: white;
         }
 
-        .btn-secondary:active {
+        .btn-secondary:hover {
             border-color: var(--doré);
             color: var(--doré);
         }
@@ -386,45 +308,48 @@
             color: white;
         }
 
-        /* Stats Cards Mobile */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 25px;
+        .btn-danger:hover {
+            background: #a01830;
         }
 
-        @media (min-width: 640px) {
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
 
         .stat-card {
             background: var(--gris-anthracite);
-            padding: 20px 15px;
+            padding: 30px;
             border-radius: 12px;
             border: 1px solid rgba(201, 169, 97, 0.1);
-            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(201, 169, 97, 0.3);
         }
 
         .stat-label {
-            font-size: 0.65rem;
+            font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.6);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
         }
 
         .stat-value {
-            font-size: 1.8rem;
+            font-size: 2.5rem;
             font-weight: 700;
             color: var(--doré);
-            margin-bottom: 3px;
+            margin-bottom: 5px;
         }
 
         .stat-change {
-            font-size: 0.75rem;
+            font-size: 0.9rem;
             color: var(--vert-success);
         }
 
@@ -432,66 +357,33 @@
             color: var(--rouge-metallique);
         }
 
-        /* Form Sections Mobile */
+        /* Form Sections */
         .form-section {
             background: var(--gris-anthracite);
-            border-radius: 16px;
-            padding: 25px 20px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
             border: 1px solid rgba(201, 169, 97, 0.1);
-        }
-
-        .section-header-with-close {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
         }
 
         .section-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
+            margin-bottom: 30px;
             color: var(--doré);
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .section-close {
-            width: 32px;
-            height: 32px;
-            background: rgba(196, 30, 58, 0.1);
-            border: 1px solid var(--rouge-metallique);
-            border-radius: 50%;
-            color: var(--rouge-metallique);
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .section-close:active {
-            background: var(--rouge-metallique);
-            color: white;
-            transform: scale(0.95);
-        }
-
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        @media (min-width: 640px) {
-            .form-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
         }
 
         .form-group {
-            margin-bottom: 5px;
+            margin-bottom: 0;
         }
 
         .form-group.full-width {
@@ -500,61 +392,61 @@
 
         .form-label {
             display: block;
-            margin-bottom: 6px;
-            font-size: 0.8rem;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
             font-weight: 500;
             color: rgba(255, 255, 255, 0.9);
         }
 
         .form-input, .form-select, .form-textarea {
             width: 100%;
-            padding: 14px;
+            padding: 14px 18px;
             background: var(--gris-moyen);
             border: 1px solid var(--gris-clair);
             color: white;
             font-family: 'Montserrat', sans-serif;
             font-size: 0.95rem;
-            border-radius: 10px;
+            border-radius: 8px;
             transition: all 0.3s;
         }
 
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: var(--doré);
-            box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.1);
+            box-shadow: 0 0 0 4px rgba(201, 169, 97, 0.1);
         }
 
         .form-textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
         }
 
         .checkbox-group {
             display: flex;
-            gap: 20px;
+            gap: 25px;
             flex-wrap: wrap;
-            margin-top: 8px;
+            margin-top: 10px;
         }
 
         .checkbox-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             cursor: pointer;
-            font-size: 0.9rem;
         }
 
         .checkbox-item input[type="checkbox"] {
             width: 20px;
             height: 20px;
             accent-color: var(--doré);
+            cursor: pointer;
         }
 
-        /* Cloudinary Upload Zone */
+        /* Upload Zone */
         .upload-zone {
             border: 2px dashed var(--gris-clair);
-            border-radius: 16px;
-            padding: 40px 20px;
+            border-radius: 12px;
+            padding: 60px 40px;
             text-align: center;
             transition: all 0.3s;
             cursor: pointer;
@@ -563,33 +455,32 @@
             overflow: hidden;
         }
 
-        .upload-zone:active, .upload-zone.dragover {
+        .upload-zone:hover, .upload-zone.dragover {
             border-color: var(--doré);
             background: rgba(201, 169, 97, 0.05);
         }
 
-        .upload-zone.uploading {
-            border-color: var(--doré);
-            background: rgba(201, 169, 97, 0.1);
+        .upload-zone.has-file {
+            border-color: var(--vert-success);
+            background: rgba(76, 175, 80, 0.05);
         }
 
         .upload-icon {
-            width: 50px;
-            height: 50px;
-            margin: 0 auto 15px;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
             stroke: var(--doré);
             stroke-width: 1.5;
         }
 
         .upload-text {
-            font-size: 1rem;
-            margin-bottom: 8px;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
             color: white;
-            font-weight: 500;
         }
 
         .upload-hint {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.5);
         }
 
@@ -603,105 +494,42 @@
             cursor: pointer;
         }
 
-        /* Preview Grid Mobile */
         .preview-container {
-            margin-top: 20px;
+            display: none;
+            margin-top: 30px;
         }
 
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .preview-title {
-            color: var(--doré);
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .preview-count {
-            background: var(--doré);
-            color: var(--noir-profond);
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            font-weight: 700;
+        .preview-container.active {
+            display: block;
         }
 
         .preview-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-
-        @media (min-width: 480px) {
-            .preview-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        @media (min-width: 768px) {
-            .preview-grid {
-                grid-template-columns: repeat(5, 1fr);
-            }
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .preview-item {
             position: relative;
-            aspect-ratio: 1;
-            border-radius: 10px;
+            aspect-ratio: 16/10;
+            border-radius: 8px;
             overflow: hidden;
             border: 2px solid var(--gris-clair);
-            transition: all 0.3s;
         }
 
-        .preview-item.uploading {
-            opacity: 0.7;
-        }
-
-        .preview-item img {
+        .preview-item img, .preview-item video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .preview-order {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            width: 24px;
-            height: 24px;
-            background: var(--doré);
-            color: var(--noir-profond);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.75rem;
-        }
-
-        .preview-main-badge {
-            position: absolute;
-            bottom: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--doré);
-            color: var(--noir-profond);
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.65rem;
-            font-weight: 700;
-        }
-
         .preview-remove {
             position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 24px;
-            height: 24px;
+            top: 5px;
+            right: 5px;
+            width: 25px;
+            height: 25px;
             background: var(--rouge-metallique);
             border: none;
             border-radius: 50%;
@@ -710,174 +538,131 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
         }
 
-        .preview-uploading {
-            position: absolute;
-            bottom: 6px;
-            right: 6px;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: var(--doré);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .drag-hint {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.75rem;
-            margin-top: 12px;
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            margin-top: 15px;
-            display: none;
-        }
-
-        .progress-container.active {
-            display: block;
+        .preview-remove:hover {
+            transform: scale(1.1);
         }
 
         .progress-bar {
             width: 100%;
-            height: 6px;
+            height: 4px;
             background: var(--gris-moyen);
-            border-radius: 3px;
+            border-radius: 2px;
+            margin-top: 20px;
             overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar.active {
+            display: block;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--doré), var(--doré-clair));
+            background: var(--doré);
             width: 0%;
             transition: width 0.3s;
         }
 
-        .progress-text {
-            text-align: center;
-            margin-top: 8px;
-            font-size: 0.8rem;
-            color: var(--doré);
-        }
-
-        /* Vehicles List Mobile */
+        /* Vehicles List */
         .vehicles-list {
             background: var(--gris-anthracite);
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
         }
 
         .vehicle-item {
             display: grid;
-            grid-template-columns: 70px 1fr auto;
+            grid-template-columns: 100px 2fr 1fr 1fr 100px;
             align-items: center;
-            padding: 15px;
+            padding: 20px;
             border-bottom: 1px solid var(--gris-moyen);
-            gap: 12px;
+            transition: background 0.3s;
+        }
+
+        .vehicle-item:hover {
+            background: rgba(201, 169, 97, 0.05);
         }
 
         .vehicle-thumb {
-            width: 70px;
-            height: 55px;
+            width: 80px;
+            height: 60px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 6px;
         }
 
         .vehicle-info h4 {
             font-weight: 600;
-            margin-bottom: 4px;
-            font-size: 0.95rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            margin-bottom: 5px;
         }
 
         .vehicle-info p {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.6);
         }
 
         .vehicle-price {
             color: var(--doré);
             font-weight: 700;
-            font-size: 0.9rem;
-            text-align: right;
+            font-size: 1.1rem;
         }
 
         .vehicle-status {
-            display: none;
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--vert-success);
+        }
+
+        .status-pending {
+            background: rgba(201, 169, 97, 0.2);
+            color: var(--doré);
         }
 
         .vehicle-actions {
-            grid-column: 1 / -1;
             display: flex;
-            justify-content: flex-end;
             gap: 10px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.05);
         }
 
         .action-btn {
-            padding: 8px 16px;
+            width: 35px;
+            height: 35px;
             border-radius: 6px;
             border: none;
             background: var(--gris-moyen);
             color: white;
             cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
             transition: all 0.3s;
         }
 
-        .action-btn.delete {
-            background: rgba(196, 30, 58, 0.2);
-            color: var(--rouge-metallique);
+        .action-btn:hover {
+            background: var(--doré);
+            color: var(--noir-profond);
         }
 
-        .action-btn:active {
-            transform: scale(0.95);
+        .action-btn.delete:hover {
+            background: var(--rouge-metallique);
+            color: white;
         }
 
-        @media (min-width: 640px) {
-            .vehicle-item {
-                grid-template-columns: 80px 2fr 1fr 100px 120px;
-            }
-            .vehicle-actions {
-                grid-column: auto;
-                padding-top: 0;
-                border-top: none;
-            }
-            .vehicle-status {
-                display: inline-block;
-                padding: 5px 10px;
-                border-radius: 15px;
-                font-size: 0.7rem;
-                font-weight: 600;
-                text-transform: uppercase;
-            }
-            .status-active {
-                background: rgba(76, 175, 80, 0.2);
-                color: var(--vert-success);
-            }
-        }
-
-        /* Toast Notifications Mobile */
+        /* Toast Notifications */
         .toast-container {
             position: fixed;
-            top: 70px;
-            left: 15px;
-            right: 15px;
+            top: 30px;
+            right: 30px;
             z-index: 10000;
             display: flex;
             flex-direction: column;
@@ -886,94 +671,109 @@
 
         .toast {
             background: var(--gris-anthracite);
-            border-left: 3px solid var(--doré);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            border-left: 4px solid var(--doré);
+            padding: 20px 25px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
-            gap: 12px;
-            animation: slideDown 0.3s ease-out;
+            gap: 15px;
+            min-width: 300px;
+            animation: slideInRight 0.4s ease-out;
+            transform-origin: right;
         }
 
-        .toast.success { border-left-color: var(--vert-success); }
-        .toast.error { border-left-color: var(--rouge-metallique); }
+        .toast.success {
+            border-left-color: var(--vert-success);
+        }
 
-        @keyframes slideDown {
+        .toast.error {
+            border-left-color: var(--rouge-metallique);
+        }
+
+        @keyframes slideInRight {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateX(100%);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateX(0);
             }
         }
 
         .toast.hide {
-            animation: slideUp 0.3s ease-in forwards;
+            animation: slideOutRight 0.4s ease-in forwards;
         }
 
-        @keyframes slideUp {
+        @keyframes slideOutRight {
             to {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateX(100%);
             }
         }
 
         .toast-icon {
-            width: 22px;
-            height: 22px;
-            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
         }
 
         .toast-content h4 {
-            font-size: 0.9rem;
-            margin-bottom: 3px;
+            font-size: 1rem;
+            margin-bottom: 5px;
         }
 
         .toast-content p {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.7);
         }
 
-        /* Tab Content */
-        .tab-content {
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .admin-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                z-index: 999;
+                transition: left 0.3s;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+
+        .mobile-toggle {
             display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .empty-state svg {
-            width: 60px;
-            height: 60px;
-            stroke: var(--gris-clair);
-            margin-bottom: 15px;
-        }
-
-        .hidden {
-            display: none !important;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: var(--gris-anthracite);
+            border: 1px solid var(--doré);
+            color: var(--doré);
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            cursor: pointer;
         }
 
         /* Loading Spinner */
         .spinner {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: var(--doré);
             border-radius: 50%;
@@ -985,12 +785,40 @@
             display: inline-block;
         }
 
-        /* Cloudinary widget customization */
-        .cloudinary-thumbnail {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            stroke: var(--gris-clair);
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -1003,11 +831,11 @@
             <form id="loginForm">
                 <div class="form-group">
                     <label class="form-label">Email</label>
-                    <input type="email" class="form-input" id="loginEmail" placeholder="admin@luxeauto.fr" required>
+                    <input type="email" class="form-input" id="loginEmail" placeholder="zinzindohoue@gmail.com" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Mot de passe</label>
-                    <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="police" required>
                 </div>
                 <button type="submit" class="login-btn" id="loginBtn">
                     <span>Connexion</span>
@@ -1019,36 +847,31 @@
 
     <!-- Admin Interface -->
     <div class="admin-container" id="adminContainer">
-        <!-- Mobile Header -->
-        <div class="mobile-header">
-            <button class="mobile-menu-toggle" onclick="toggleSidebar()">☰</button>
-            <div class="mobile-logo">LUXE AUTO</div>
-            <div style="width: 40px;"></div>
-        </div>
-
-        <!-- Sidebar Overlay -->
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
+        <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+        
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <button class="sidebar-close" onclick="toggleSidebar()">×</button>
+            <a href="#" class="sidebar-logo">LUXE AUTO</a>
+            
             <div class="nav-section">
                 <div class="nav-title">Menu Principal</div>
                 <button class="nav-item active" onclick="showTab('dashboard')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
                     </svg>
                     Tableau de bord
                 </button>
                 <button class="nav-item" onclick="showTab('add-vehicle')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M12 5v14M5 12h14"/>
                     </svg>
                     Ajouter un véhicule
                 </button>
                 <button class="nav-item" onclick="showTab('vehicles')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/>
                     </svg>
                     Gestion véhicules
@@ -1058,7 +881,7 @@
             <div class="nav-section">
                 <div class="nav-title">Paramètres</div>
                 <button class="nav-item" onclick="showTab('settings')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <circle cx="12" cy="12" r="3"/>
                         <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
                     </svg>
@@ -1067,7 +890,7 @@
             </div>
 
             <button class="nav-item logout-btn" onclick="logout()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m8 14l4-4m0 0l-4-4m4 4H9"/>
                 </svg>
                 Déconnexion
@@ -1083,44 +906,49 @@
                         <h1 class="page-title">Tableau de bord</h1>
                         <p class="page-subtitle">Vue d'ensemble de votre activité</p>
                     </div>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="showTab('add-vehicle')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            Nouveau véhicule
+                        </button>
+                    </div>
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-label">Véhicules</div>
+                        <div class="stat-label">Véhicules en stock</div>
                         <div class="stat-value" id="statTotal">0</div>
-                        <div class="stat-change">+12%</div>
+                        <div class="stat-change">+12% ce mois</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">Vues</div>
+                        <div class="stat-label">Vues ce mois</div>
                         <div class="stat-value">12.4K</div>
-                        <div class="stat-change">+28%</div>
+                        <div class="stat-change">+28% ce mois</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">Demandes</div>
+                        <div class="stat-label">Demandes reçues</div>
                         <div class="stat-value">48</div>
-                        <div class="stat-change">+5%</div>
+                        <div class="stat-change">+5% ce mois</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">Ventes</div>
+                        <div class="stat-label">Ventes réalisées</div>
                         <div class="stat-value">12</div>
-                        <div class="stat-change negative">-3%</div>
+                        <div class="stat-change negative">-3% ce mois</div>
                     </div>
                 </div>
 
                 <div class="form-section">
-                    <div class="section-header-with-close">
-                        <h3 class="section-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                            </svg>
-                            Activité récente
-                        </h3>
-                        <button class="section-close" onclick="showToast('info', 'Info', 'Fonctionnalité à venir')" title="Fermer">×</button>
-                    </div>
+                    <h3 class="section-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
+                        Activité récente
+                    </h3>
                     <div class="vehicles-list" id="recentActivity">
                         <div class="empty-state">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M9 17v-2H4.5A2.5 2.5 0 012 12.5v-9A2.5 2.5 0 014.5 1h9A2.5 2.5 0 0116 3.5V9h-2V3.5a.5.5 0 00-.5-.5h-9a.5.5 0 00-.5.5v9a.5.5 0 00.5.5H9zm9.5 7h-9a2.5 2.5 0 01-2.5-2.5v-9a2.5 2.5 0 012.5-2.5h9a2.5 2.5 0 012.5 2.5v9a2.5 2.5 0 01-2.5 2.5z"/>
                             </svg>
                             <p>Aucune activité récente</p>
@@ -1133,175 +961,104 @@
             <div class="tab-content" id="add-vehicle-tab">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Ajouter un véhicule</h1>
-                        <p class="page-subtitle">Nouvelle fiche avec photos Cloudinary</p>
+                        <h1 class="page-title">Publier un véhicule</h1>
+                        <p class="page-subtitle">Saisissez les détails et publiez rapidement</p>
                     </div>
                 </div>
 
-                <form id="vehicleForm">
-                    <div class="form-section">
-                        <div class="section-header-with-close">
-                            <h3 class="section-title">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                                    <circle cx="12" cy="7" r="4"/>
-                                </svg>
-                                Informations
-                            </h3>
-                            <button type="button" class="section-close" onclick="resetForm()" title="Annuler et fermer">×</button>
-                        </div>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label">Marque *</label>
-                                <select class="form-select" id="brand" required>
-                                    <option value="">Sélectionner...</option>
-                                    <option value="Porsche">Porsche</option>
-                                    <option value="Mercedes-Benz">Mercedes-Benz</option>
-                                    <option value="BMW">BMW</option>
-                                    <option value="Audi">Audi</option>
-                                    <option value="Bentley">Bentley</option>
-                                    <option value="Lamborghini">Lamborghini</option>
-                                    <option value="Ferrari">Ferrari</option>
-                                    <option value="Aston Martin">Aston Martin</option>
-                                    <option value="Rolls-Royce">Rolls-Royce</option>
-                                    <option value="Maserati">Maserati</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Modèle *</label>
-                                <input type="text" class="form-input" id="model" placeholder="911 Carrera S" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Année *</label>
-                                <input type="number" class="form-input" id="year" min="1900" max="2030" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Prix (€) *</label>
-                                <input type="number" class="form-input" id="price" placeholder="150000" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Kilométrage</label>
-                                <input type="number" class="form-input" id="mileage" placeholder="0">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Puissance (ch)</label>
-                                <input type="number" class="form-input" id="power" placeholder="450">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Carburant</label>
-                                <select class="form-select" id="fuel">
-                                    <option value="Essence">Essence</option>
-                                    <option value="Diesel">Diesel</option>
-                                    <option value="Hybride">Hybride</option>
-                                    <option value="Électrique">Électrique</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Transmission</label>
-                                <select class="form-select" id="transmission">
-                                    <option value="Automatique">Automatique</option>
-                                    <option value="Manuelle">Manuelle</option>
-                                    <option value="Semi-automatique">Semi-automatique</option>
-                                </select>
-                            </div>
-                            <div class="form-group full-width">
-                                <label class="form-label">Options</label>
-                                <div class="checkbox-group">
-                                    <label class="checkbox-item">
-                                        <input type="checkbox" id="isPremium"> Premium
-                                    </label>
-                                    <label class="checkbox-item">
-                                        <input type="checkbox" id="isNew"> Nouveau
-                                    </label>
-                                    <label class="checkbox-item">
-                                        <input type="checkbox" id="isAvailable" checked> Disponible
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group full-width">
-                                <label class="form-label">Description</label>
-                                <textarea class="form-textarea" id="description" placeholder="Description du véhicule..."></textarea>
-                            </div>
-                        </div>
+                <div class="form-section" style="max-width: 800px;">
+                    <h3 class="section-title">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Détails du véhicule
+                    </h3>
+                    
+                    <!-- Zone de texte libre -->
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label class="form-label">Description complète du véhicule *</label>
+                        <textarea class="form-textarea" id="quickDescription" rows="8" placeholder="Saisissez ici tous les détails à connaître sur le véhicule :&#10;&#10;Ex: Porsche 911 Carrera S - 2022&#10;Prix : 145 000 €&#10;Kilométrage : 15 000 km&#10;Puissance : 450 ch&#10;Boîte : Automatique&#10;Carburant : Essence&#10;Couleur : Blanc Carrara&#10;Options : Toit ouvrant, Sièges sport, Bose Audio...&#10;&#10;Toute information utile pour l'acheteur..." style="min-height: 220px; font-size: 0.95rem; line-height: 1.7;"></textarea>
+                        <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem; margin-top: 8px;">💡 Décrivez librement : marque, modèle, année, prix, kilométrage, options, état général…</p>
                     </div>
 
-                    <div class="form-section">
-                        <div class="section-header-with-close">
-                            <h3 class="section-title">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                                    <polyline points="21 15 16 10 5 21"/>
-                                </svg>
-                                Photos Cloudinary
-                            </h3>
-                            <button type="button" class="section-close" onclick="clearImages()" title="Supprimer toutes les images">×</button>
-                        </div>
-                        
-                        <div class="upload-zone" id="uploadZone">
-                            <input type="file" class="file-input" id="fileInput" multiple accept="image/*" max="10">
-                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <!-- Upload images -->
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label class="form-label">Photos du véhicule</label>
+                        <div class="upload-zone" id="uploadZone" style="padding: 40px 30px;">
+                            <input type="file" class="file-input" id="fileInput" multiple accept="image/*,video/*">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 45px; height: 45px; margin-bottom: 12px;">
                                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                                 <polyline points="17 8 12 3 7 8"/>
                                 <line x1="12" y1="3" x2="12" y2="15"/>
                             </svg>
-                            <div class="upload-text">Ajouter des photos</div>
-                            <div class="upload-hint">Max 10 photos - Cloudinary</div>
+                            <div class="upload-text" style="font-size: 0.95rem;">Cliquez ou glissez vos photos ici</div>
+                            <div class="upload-hint">JPG, PNG, MP4 acceptés</div>
                         </div>
 
-                        <div class="progress-container" id="progressContainer">
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="progressFill"></div>
-                            </div>
-                            <div class="progress-text" id="progressText">Upload... 0%</div>
+                        <div class="progress-bar" id="progressBar">
+                            <div class="progress-fill" id="progressFill"></div>
                         </div>
 
-                        <div class="preview-container hidden" id="previewContainer">
-                            <div class="preview-header">
-                                <span class="preview-title">Photos</span>
-                                <span class="preview-count" id="previewCount">0/10</span>
-                            </div>
+                        <div class="preview-container" id="previewContainer">
+                            <h4 style="margin-bottom: 15px; color: var(--doré); font-size: 0.9rem;">Aperçu des fichiers</h4>
                             <div class="preview-grid" id="previewGrid"></div>
-                            <p class="drag-hint">ℹ️ La 1ère photo sera l'image principale</p>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <button type="button" class="btn btn-secondary" onclick="resetForm()" style="flex: 1;">Annuler</button>
-                        <button type="submit" class="btn btn-primary" id="submitBtn" style="flex: 2;">
-                            <span>Publier</span>
+                    <!-- Options rapides -->
+                    <div class="form-group" style="margin-bottom: 30px;">
+                        <label class="form-label">Statut</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="isPremium"> ⭐ Premium
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="isNew"> 🆕 Nouveau
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="isAvailable" checked> ✅ Disponible
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <button type="button" class="btn btn-secondary" onclick="resetQuickForm()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9"/><polyline points="3 3 3 9 9 9"/></svg>
+                            Réinitialiser
+                        </button>
+                        <button type="button" class="btn btn-primary" id="submitBtn" onclick="publishVehicle()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+                            <span>Publier maintenant</span>
                             <div class="spinner" id="submitSpinner"></div>
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
 
             <!-- Vehicles List Tab -->
             <div class="tab-content" id="vehicles-tab">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Gestion</h1>
-                        <p class="page-subtitle">Véhicules en stock</p>
+                        <h1 class="page-title">Gestion des véhicules</h1>
+                        <p class="page-subtitle">Gérez votre inventaire</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="refreshVehicles()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 4 23 10 17 10"/>
+                                <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+                            </svg>
+                            Actualiser
+                        </button>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <div class="section-header-with-close">
-                        <h3 class="section-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/>
-                            </svg>
-                            Liste des véhicules
-                        </h3>
-                        <button class="section-close" onclick="showTab('dashboard')" title="Fermer">×</button>
-                    </div>
-                    <div class="vehicles-list" id="vehiclesList">
-                        <div class="empty-state">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/>
-                            </svg>
-                            <p>Chargement...</p>
-                        </div>
+                <div class="vehicles-list" id="vehiclesList">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/>
+                        </svg>
+                        <p>Chargement des véhicules...</p>
                     </div>
                 </div>
             </div>
@@ -1311,23 +1068,30 @@
                 <div class="page-header">
                     <div>
                         <h1 class="page-title">Configuration</h1>
-                        <p class="page-subtitle">Paramètres système</p>
+                        <p class="page-subtitle">Paramètres du système</p>
                     </div>
                 </div>
                 
                 <div class="form-section">
-                    <div class="section-header-with-close">
-                        <h3 class="section-title">Informations</h3>
-                        <button class="section-close" onclick="showTab('dashboard')" title="Fermer">×</button>
-                    </div>
+                    <h3 class="section-title">Informations du site</h3>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label class="form-label">WhatsApp</label>
-                            <input type="tel" class="form-input" id="whatsappNumber" value="0172369840">
+                            <label class="form-label">Nom du site</label>
+                            <input type="text" class="form-input" value="Luxe Auto">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email de contact</label>
+                            <input type="email" class="form-input" value="contact@luxeauto.fr">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Téléphone</label>
+                            <input type="tel" class="form-input" value="+33 1 23 45 67 89">
                         </div>
                     </div>
-                    <div style="margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%;">Sauvegarder</button>
+                    <div style="margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="showToast('success', 'Paramètres sauvegardés', 'Les modifications ont été enregistrées.')">
+                            Sauvegarder les changements
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1337,11 +1101,12 @@
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Firebase -->
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
         import { getDatabase, ref, push, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCPGgtXoDUycykLaTSee0S0yY0tkeJpqKI",
@@ -1357,13 +1122,7 @@
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const database = getDatabase(app);
-
-        // Cloudinary config
-        const CLOUDINARY = {
-            cloudName: 'djxcqczh1',
-            uploadPreset: 'database',
-            apiKey: 'YOUR_API_KEY' // Optionnel pour unsigned upload
-        };
+        const storage = getStorage(app);
 
         // Global functions
         window.showToast = function(type, title, message) {
@@ -1389,13 +1148,8 @@
             
             setTimeout(() => {
                 toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        };
-
-        window.toggleSidebar = function() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('sidebarOverlay').classList.toggle('active');
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
         };
 
         window.showTab = function(tabName) {
@@ -1405,56 +1159,75 @@
             document.getElementById(tabName + '-tab').classList.add('active');
             event.target.classList.add('active');
             
-            if (window.innerWidth < 768) {
-                toggleSidebar();
-            }
-            
             if (tabName === 'vehicles') {
                 loadVehicles();
             }
         };
 
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        };
+
         window.logout = function() {
             document.getElementById('adminContainer').classList.remove('active');
             document.getElementById('loginScreen').classList.remove('hidden');
-            showToast('success', 'Déconnecté', 'À bientôt !');
+            showToast('success', 'Déconnexion', 'Vous êtes déconnecté.');
         };
 
         window.resetForm = function() {
-            document.getElementById('vehicleForm').reset();
-            uploadedImages = [];
-            updatePreview();
-            document.getElementById('year').value = new Date().getFullYear();
-            showTab('dashboard');
+            document.getElementById('quickDescription').value = '';
+            document.getElementById('previewContainer').classList.remove('active');
+            document.getElementById('previewGrid').innerHTML = '';
+            document.getElementById('isPremium').checked = false;
+            document.getElementById('isNew').checked = false;
+            document.getElementById('isAvailable').checked = true;
+            uploadedFiles = [];
         };
 
-        window.clearImages = function() {
-            uploadedImages = [];
-            updatePreview();
-            showToast('info', 'Images supprimées', 'Toutes les photos ont été retirées');
-        };
-
-        window.saveSettings = function() {
-            const whatsapp = document.getElementById('whatsappNumber').value;
-            localStorage.setItem('whatsappNumber', whatsapp);
-            showToast('success', 'Sauvegardé', 'Paramètres mis à jour');
+        window.refreshVehicles = function() {
+            loadVehicles();
+            showToast('success', 'Actualisation', 'La liste des véhicules a été mise à jour.');
         };
 
         window.deleteVehicle = function(id) {
-            if (confirm('Supprimer ce véhicule ?')) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
                 remove(ref(database, 'vehicles/' + id))
                     .then(() => {
-                        showToast('success', 'Supprimé', 'Véhicule retiré');
+                        showToast('success', 'Supprimé', 'Le véhicule a été supprimé.');
                         loadVehicles();
                     })
-                    .catch(error => showToast('error', 'Erreur', error.message));
+                    .catch(error => {
+                        showToast('error', 'Erreur', error.message);
+                    });
             }
         };
 
-        // Cloudinary Upload
-        let uploadedImages = [];
+        // Login handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const spinner = document.getElementById('loginSpinner');
+            
+            btn.disabled = true;
+            spinner.classList.add('active');
+            
+            // Simulation d'authentification (à remplacer par Firebase Auth réel)
+            setTimeout(() => {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('adminContainer').classList.add('active');
+                btn.disabled = false;
+                spinner.classList.remove('active');
+                showToast('success', 'Connexion réussie', 'Bienvenue dans l\'espace administration.');
+                updateStats();
+            }, 1500);
+        });
+
+        // File upload handling
+        let uploadedFiles = [];
         const uploadZone = document.getElementById('uploadZone');
         const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewGrid = document.getElementById('previewGrid');
 
         uploadZone.addEventListener('click', () => fileInput.click());
         
@@ -1477,143 +1250,145 @@
             handleFiles(e.target.files);
         });
 
-        async function handleFiles(files) {
-            const remaining = 10 - uploadedImages.length;
-            const toUpload = Array.from(files).slice(0, remaining);
-            
-            if (files.length > remaining) {
-                showToast('error', 'Limite', `Max ${remaining} photo(s) supplémentaire(s)`);
-            }
-
-            uploadZone.classList.add('uploading');
-
-            for (let file of toUpload) {
-                if (!file.type.startsWith('image/')) {
-                    showToast('error', 'Format invalide', `${file.name} rejeté`);
-                    continue;
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (!file.type.match(/image.*|video.*/)) {
+                    showToast('error', 'Format non supporté', 'Seuls les images et vidéos sont acceptés.');
+                    return;
                 }
-
-                // Add placeholder
-                const tempId = Date.now() + Math.random();
-                uploadedImages.push({
-                    id: tempId,
-                    url: null,
-                    uploading: true,
-                    file: file
-                });
-                updatePreview();
-
-                try {
-                    const url = await uploadToCloudinary(file);
-                    const idx = uploadedImages.findIndex(img => img.id === tempId);
-                    if (idx !== -1) {
-                        uploadedImages[idx].url = url;
-                        uploadedImages[idx].uploading = false;
+                
+                uploadedFiles.push(file);
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    
+                    if (file.type.startsWith('image/')) {
+                        div.innerHTML = `
+                            <img src="${e.target.result}" alt="${file.name}">
+                            <button class="preview-remove" onclick="removeFile(this, '${file.name}')">×</button>
+                        `;
+                    } else {
+                        div.innerHTML = `
+                            <video src="${e.target.result}"></video>
+                            <button class="preview-remove" onclick="removeFile(this, '${file.name}')">×</button>
+                        `;
                     }
-                } catch (error) {
-                    showToast('error', 'Upload failed', error.message);
-                    uploadedImages = uploadedImages.filter(img => img.id !== tempId);
-                }
-                updatePreview();
-            }
-
-            uploadZone.classList.remove('uploading');
-        }
-
-        async function uploadToCloudinary(file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', CLOUDINARY.uploadPreset);
-            formData.append('cloud_name', CLOUDINARY.cloudName);
-
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/image/upload`, {
-                method: 'POST',
-                body: formData
+                    
+                    previewGrid.appendChild(div);
+                };
+                reader.readAsDataURL(file);
             });
-
-            if (!response.ok) throw new Error('Upload failed');
             
-            const data = await response.json();
-            return data.secure_url;
-        }
-
-        function updatePreview() {
-            const container = document.getElementById('previewContainer');
-            const grid = document.getElementById('previewGrid');
-            const count = document.getElementById('previewCount');
-            
-            count.textContent = `${uploadedImages.length}/10`;
-            
-            if (uploadedImages.length === 0) {
-                container.classList.add('hidden');
-                return;
+            if (uploadedFiles.length > 0) {
+                previewContainer.classList.add('active');
+                uploadZone.classList.add('has-file');
             }
-            
-            container.classList.remove('hidden');
-            
-            grid.innerHTML = uploadedImages.map((img, index) => `
-                <div class="preview-item ${img.uploading ? 'uploading' : ''}">
-                    ${img.url ? `<img src="${img.url}" alt="">` : '<div style="width:100%;height:100%;background:var(--gris-clair);"></div>'}
-                    <div class="preview-order">${index + 1}</div>
-                    ${index === 0 ? '<div class="preview-main-badge">Main</div>' : ''}
-                    ${img.uploading ? '<div class="preview-uploading"></div>' : ''}
-                    <button type="button" class="preview-remove" onclick="removeImage(${index})">×</button>
-                </div>
-            `).join('');
         }
 
-        window.removeImage = function(index) {
-            uploadedImages.splice(index, 1);
-            updatePreview();
+        window.removeFile = function(btn, fileName) {
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+            btn.parentElement.remove();
+            
+            if (uploadedFiles.length === 0) {
+                previewContainer.classList.remove('active');
+                uploadZone.classList.remove('has-file');
+            }
         };
 
-        // Form submission
-        document.getElementById('vehicleForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (uploadedImages.length === 0 || uploadedImages.some(img => img.uploading)) {
-                showToast('error', 'Photos requises', 'Veuillez attendre la fin des uploads');
+        window.resetQuickForm = function() {
+            document.getElementById('quickDescription').value = '';
+            document.getElementById('previewContainer').classList.remove('active');
+            document.getElementById('previewGrid').innerHTML = '';
+            document.getElementById('isPremium').checked = false;
+            document.getElementById('isNew').checked = false;
+            document.getElementById('isAvailable').checked = true;
+            uploadedFiles = [];
+        };
+
+        window.publishVehicle = async function() {
+            const description = document.getElementById('quickDescription').value.trim();
+            if (!description) {
+                showToast('error', 'Champ requis', 'Veuillez saisir les détails du véhicule.');
                 return;
             }
 
             const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('submitSpinner');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+
             submitBtn.disabled = true;
+            spinner.classList.add('active');
+            progressBar.classList.add('active');
 
             try {
-                const imageUrls = uploadedImages.map(img => img.url);
-                
+                // Upload images
+                const uploadPromises = uploadedFiles.map((file) => {
+                    const fileRef = storageRef(storage, `vehicles/${Date.now()}_${file.name}`);
+                    const uploadTask = uploadBytesResumable(fileRef, file);
+                    return new Promise((resolve, reject) => {
+                        uploadTask.on('state_changed',
+                            (snapshot) => {
+                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                progressFill.style.width = progress + '%';
+                            },
+                            (error) => reject(error),
+                            async () => {
+                                const url = await getDownloadURL(uploadTask.snapshot.ref);
+                                resolve({ url, type: file.type });
+                            }
+                        );
+                    });
+                });
+
+                const uploadedUrls = await Promise.all(uploadPromises);
+                const images = uploadedUrls.filter(u => u.type.startsWith('image/')).map(u => u.url);
+                const imageUrl = images[0] || '';
+                const videoUrl = uploadedUrls.find(u => u.type.startsWith('video/'))?.url || '';
+
+                // Extract a short title from first line of description
+                const firstLine = description.split('\n')[0].trim();
+                const vehicleName = firstLine.length > 60 ? firstLine.substring(0, 60) + '…' : firstLine;
+
                 const vehicleData = {
-                    brand: document.getElementById('brand').value,
-                    name: document.getElementById('model').value,
-                    year: parseInt(document.getElementById('year').value),
-                    price: parseInt(document.getElementById('price').value),
-                    mileage: parseInt(document.getElementById('mileage').value) || 0,
-                    power: parseInt(document.getElementById('power').value) || 0,
-                    fuel: document.getElementById('fuel').value,
-                    transmission: document.getElementById('transmission').value,
-                    description: document.getElementById('description').value,
+                    name: vehicleName,
+                    brand: firstLine.split(' ')[0] || 'Véhicule',
+                    description: description,
                     premium: document.getElementById('isPremium').checked,
                     new: document.getElementById('isNew').checked,
                     available: document.getElementById('isAvailable').checked,
-                    images: imageUrls,
-                    imageUrl: imageUrls[0],
+                    imageUrl: imageUrl,
+                    images: images.length > 0 ? images : undefined,
+                    videoUrl: videoUrl,
+                    hasVideo: !!videoUrl,
+                    year: new Date().getFullYear(),
+                    mileage: 0,
                     createdAt: Date.now()
                 };
 
-                const newRef = push(ref(database, 'vehicles'));
-                await set(newRef, vehicleData);
+                const newVehicleRef = push(ref(database, 'vehicles'));
+                await set(newVehicleRef, vehicleData);
 
-                showToast('success', 'Publié !', `${vehicleData.brand} ${vehicleData.name} ajouté`);
-                resetForm();
+                showToast('success', 'Véhicule publié !', 'La fiche a été ajoutée avec succès.');
+                resetQuickForm();
                 updateStats();
 
             } catch (error) {
-                showToast('error', 'Erreur', error.message);
+                showToast('error', 'Erreur de publication', error.message);
             } finally {
                 submitBtn.disabled = false;
+                spinner.classList.remove('active');
+                progressBar.classList.remove('active');
+                progressFill.style.width = '0%';
             }
-        });
+        };
 
+        // Legacy resetForm alias
+        window.resetForm = window.resetQuickForm;
+
+        // Load vehicles list
         function loadVehicles() {
             const list = document.getElementById('vehiclesList');
             list.innerHTML = '<div class="empty-state"><p>Chargement...</p></div>';
@@ -1624,36 +1399,44 @@
                 if (!data) {
                     list.innerHTML = `
                         <div class="empty-state">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                 <path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/>
                             </svg>
-                            <p>Aucun véhicule</p>
+                            <p>Aucun véhicule en stock</p>
                         </div>
                     `;
                     return;
                 }
                 
                 list.innerHTML = '';
-                Object.keys(data).reverse().forEach(key => {
+                Object.keys(data).forEach(key => {
                     const v = data[key];
                     const item = document.createElement('div');
                     item.className = 'vehicle-item';
                     item.innerHTML = `
-                        <img src="${v.images?.[0] || v.imageUrl}" class="vehicle-thumb" alt="">
+                        <img src="${v.imageUrl || 'https://via.placeholder.com/80x60'}" class="vehicle-thumb" alt="${v.name}">
                         <div class="vehicle-info">
                             <h4>${v.brand} ${v.name}</h4>
-                            <p>${v.year} • ${(v.mileage/1000).toFixed(0)}k km</p>
+                            <p>${v.year} • ${v.mileage?.toLocaleString() || 0} km • ${v.fuel}</p>
                         </div>
-                        <div class="vehicle-price">${v.price?.toLocaleString('fr-FR')}€</div>
-                        <div class="vehicle-status ${v.available ? 'status-active' : ''}">
-                            ${v.available ? 'Dispo' : 'Réservé'}
+                        <div class="vehicle-price">${v.price?.toLocaleString('fr-FR')} €</div>
+                        <div>
+                            <span class="vehicle-status ${v.available ? 'status-active' : 'status-pending'}">
+                                ${v.available ? 'Disponible' : 'Réservé'}
+                            </span>
                         </div>
                         <div class="vehicle-actions">
-                            <button class="action-btn" onclick="showToast('info', 'Bientôt', 'Édition en développement')">
-                                ✎ Modifier
+                            <button class="action-btn" onclick="showToast('info', 'Édition', 'Fonctionnalité à venir')" title="Modifier">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
                             </button>
-                            <button class="action-btn delete" onclick="deleteVehicle('${key}')">
-                                🗑 Supprimer
+                            <button class="action-btn delete" onclick="deleteVehicle('${key}')" title="Supprimer">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                </svg>
                             </button>
                         </div>
                     `;
@@ -1664,31 +1447,16 @@
 
         function updateStats() {
             onValue(ref(database, 'vehicles'), (snapshot) => {
-                document.getElementById('statTotal').textContent = snapshot.size || 0;
+                const count = snapshot.size || 0;
+                document.getElementById('statTotal').textContent = count;
             }, { onlyOnce: true });
         }
 
-        // Login
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            btn.disabled = true;
-            
-            setTimeout(() => {
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('adminContainer').classList.add('active');
-                btn.disabled = false;
-                showToast('success', 'Connecté', 'Bienvenue !');
-                updateStats();
-            }, 1000);
-        });
-
-        // Init
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            // Set current year in form
             document.getElementById('year').value = new Date().getFullYear();
-            const savedWhatsapp = localStorage.getItem('whatsappNumber');
-            if (savedWhatsapp) document.getElementById('whatsappNumber').value = savedWhatsapp;
         });
     </script>
 </body>
-</html>v
+</html>
