@@ -1106,7 +1106,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
         import { getDatabase, ref, push, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCPGgtXoDUycykLaTSee0S0yY0tkeJpqKI",
@@ -1119,10 +1118,46 @@
             measurementId: "G-FYQCWY5G4S"
         };
 
+        // Configuration Cloudinary
+        const cloudinaryConfig = {
+            cloudName: 'djxcqczh1',
+            uploadPreset: 'database'
+        };
+
+        // Upload vers Cloudinary
+        async function uploadToCloudinary(file, onProgress) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                const resourceType = file.type.startsWith('video/') ? 'video' : 'image';
+                xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/${resourceType}/upload`);
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable && onProgress) {
+                        onProgress(Math.round((e.loaded / e.total) * 100));
+                    }
+                };
+
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        const data = JSON.parse(xhr.responseText);
+                        resolve({ url: data.secure_url, type: file.type });
+                    } else {
+                        reject(new Error('Erreur Cloudinary : ' + xhr.statusText));
+                    }
+                };
+
+                xhr.onerror = () => reject(new Error('Erreur réseau lors de l\'upload.'));
+                xhr.send(formData);
+            });
+        }
+
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const database = getDatabase(app);
-        const storage = getStorage(app);
 
         // Global functions
         window.showToast = function(type, title, message) {
@@ -1172,16 +1207,6 @@
             document.getElementById('adminContainer').classList.remove('active');
             document.getElementById('loginScreen').classList.remove('hidden');
             showToast('success', 'Déconnexion', 'Vous êtes déconnecté.');
-        };
-
-        window.resetForm = function() {
-            document.getElementById('quickDescription').value = '';
-            document.getElementById('previewContainer').classList.remove('active');
-            document.getElementById('previewGrid').innerHTML = '';
-            document.getElementById('isPremium').checked = false;
-            document.getElementById('isNew').checked = false;
-            document.getElementById('isAvailable').checked = true;
-            uploadedFiles = [];
         };
 
         window.refreshVehicles = function() {
@@ -1322,33 +1347,31 @@
             submitBtn.disabled = true;
             spinner.classList.add('active');
             progressBar.classList.add('active');
+            progressFill.style.width = '0%';
 
             try {
-                // Upload images
-                const uploadPromises = uploadedFiles.map((file) => {
-                    const fileRef = storageRef(storage, `vehicles/${Date.now()}_${file.name}`);
-                    const uploadTask = uploadBytesResumable(fileRef, file);
-                    return new Promise((resolve, reject) => {
-                        uploadTask.on('state_changed',
-                            (snapshot) => {
-                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                                progressFill.style.width = progress + '%';
-                            },
-                            (error) => reject(error),
-                            async () => {
-                                const url = await getDownloadURL(uploadTask.snapshot.ref);
-                                resolve({ url, type: file.type });
-                            }
-                        );
-                    });
-                });
+                // Upload images vers Cloudinary
+                const total = uploadedFiles.length;
+                let completed = 0;
+
+                const uploadPromises = uploadedFiles.map((file) =>
+                    uploadToCloudinary(file, (pct) => {
+                        // Progression globale approximative
+                        const global = Math.round(((completed + pct / 100) / Math.max(total, 1)) * 100);
+                        progressFill.style.width = global + '%';
+                    }).then((result) => {
+                        completed++;
+                        progressFill.style.width = Math.round((completed / Math.max(total, 1)) * 100) + '%';
+                        return result;
+                    })
+                );
 
                 const uploadedUrls = await Promise.all(uploadPromises);
                 const images = uploadedUrls.filter(u => u.type.startsWith('image/')).map(u => u.url);
                 const imageUrl = images[0] || '';
                 const videoUrl = uploadedUrls.find(u => u.type.startsWith('video/'))?.url || '';
 
-                // Extract a short title from first line of description
+                // Extraire un titre depuis la première ligne
                 const firstLine = description.split('\n')[0].trim();
                 const vehicleName = firstLine.length > 60 ? firstLine.substring(0, 60) + '…' : firstLine;
 
@@ -1361,7 +1384,7 @@
                     available: document.getElementById('isAvailable').checked,
                     imageUrl: imageUrl,
                     images: images.length > 0 ? images : undefined,
-                    videoUrl: videoUrl,
+                    videoUrl: videoUrl || undefined,
                     hasVideo: !!videoUrl,
                     year: new Date().getFullYear(),
                     mileage: 0,
@@ -1371,6 +1394,7 @@
                 const newVehicleRef = push(ref(database, 'vehicles'));
                 await set(newVehicleRef, vehicleData);
 
+                progressFill.style.width = '100%';
                 showToast('success', 'Véhicule publié !', 'La fiche a été ajoutée avec succès.');
                 resetQuickForm();
                 updateStats();
@@ -1380,13 +1404,12 @@
             } finally {
                 submitBtn.disabled = false;
                 spinner.classList.remove('active');
-                progressBar.classList.remove('active');
-                progressFill.style.width = '0%';
+                setTimeout(() => {
+                    progressBar.classList.remove('active');
+                    progressFill.style.width = '0%';
+                }, 800);
             }
         };
-
-        // Legacy resetForm alias
-        window.resetForm = window.resetQuickForm;
 
         // Load vehicles list
         function loadVehicles() {
@@ -1454,8 +1477,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Set current year in form
-            document.getElementById('year').value = new Date().getFullYear();
+            updateStats();
         });
     </script>
 </body>
