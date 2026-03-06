@@ -974,11 +974,21 @@
                         Détails du véhicule
                     </h3>
                     
+                    <!-- Prix -->
+                    <div class="form-group" style="margin-bottom: 25px;">
+                        <label class="form-label">💰 Prix du véhicule (FCFA)</label>
+                        <div style="position:relative;">
+                            <input type="number" class="form-input" id="quickPrice" placeholder="Ex: 12500000" min="0" style="padding-right: 70px; font-size: 1.05rem;">
+                            <span style="position:absolute; right:15px; top:50%; transform:translateY(-50%); color:var(--doré); font-weight:600; font-size:0.85rem; pointer-events:none;">FCFA</span>
+                        </div>
+                        <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem; margin-top: 6px;">Laissez vide si le prix est à négocier</p>
+                    </div>
+
                     <!-- Zone de texte libre -->
                     <div class="form-group" style="margin-bottom: 25px;">
                         <label class="form-label">Description complète du véhicule *</label>
-                        <textarea class="form-textarea" id="quickDescription" rows="8" placeholder="Saisissez ici tous les détails à connaître sur le véhicule :&#10;&#10;Ex: Porsche 911 Carrera S - 2022&#10;Prix : 145 000 €&#10;Kilométrage : 15 000 km&#10;Puissance : 450 ch&#10;Boîte : Automatique&#10;Carburant : Essence&#10;Couleur : Blanc Carrara&#10;Options : Toit ouvrant, Sièges sport, Bose Audio...&#10;&#10;Toute information utile pour l'acheteur..." style="min-height: 220px; font-size: 0.95rem; line-height: 1.7;"></textarea>
-                        <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem; margin-top: 8px;">💡 Décrivez librement : marque, modèle, année, prix, kilométrage, options, état général…</p>
+                        <textarea class="form-textarea" id="quickDescription" rows="8" placeholder="Saisissez ici tous les détails à connaître sur le véhicule :&#10;&#10;Ex: Porsche 911 Carrera S - 2022&#10;Kilométrage : 15 000 km&#10;Puissance : 450 ch&#10;Boîte : Automatique&#10;Carburant : Essence&#10;Couleur : Blanc Carrara&#10;Options : Toit ouvrant, Sièges sport, Bose Audio...&#10;&#10;Toute information utile pour l'acheteur..." style="min-height: 220px; font-size: 0.95rem; line-height: 1.7;"></textarea>
+                        <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem; margin-top: 8px;">💡 Décrivez librement : marque, modèle, année, kilométrage, options, état général…</p>
                     </div>
 
                     <!-- Upload images -->
@@ -1096,6 +1106,44 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10000; overflow-y:auto; padding:40px 20px;">
+        <div style="background:var(--gris-anthracite); border-radius:16px; border:1px solid rgba(201,169,97,0.3); max-width:700px; margin:0 auto; padding:40px; position:relative;">
+            <button onclick="closeEditModal()" style="position:absolute;top:20px;right:20px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.8rem;cursor:pointer;line-height:1;">×</button>
+            <h2 style="font-family:'Playfair Display',serif; color:var(--doré); margin-bottom:30px; font-size:1.5rem;">✏️ Modifier le véhicule</h2>
+
+            <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label">💰 Prix (FCFA)</label>
+                <div style="position:relative;">
+                    <input type="number" class="form-input" id="editPrice" placeholder="Ex: 12500000" min="0" style="padding-right:70px;">
+                    <span style="position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--doré);font-weight:600;font-size:0.85rem;pointer-events:none;">FCFA</span>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:20px;">
+                <label class="form-label">Description du véhicule</label>
+                <textarea class="form-textarea" id="editDescription" rows="8" style="min-height:200px; font-size:0.95rem; line-height:1.7;"></textarea>
+            </div>
+
+            <div class="form-group" style="margin-bottom:25px;">
+                <label class="form-label">Statut</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox" id="editPremium"> ⭐ Premium</label>
+                    <label class="checkbox-item"><input type="checkbox" id="editNew"> 🆕 Nouveau</label>
+                    <label class="checkbox-item"><input type="checkbox" id="editAvailable"> ✅ Disponible</label>
+                </div>
+            </div>
+
+            <div style="display:flex; gap:15px; justify-content:flex-end;">
+                <button class="btn btn-secondary" onclick="closeEditModal()">Annuler</button>
+                <button class="btn btn-primary" onclick="saveEdit()" id="saveEditBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Enregistrer les modifications
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Toast Container -->
@@ -1324,6 +1372,7 @@
 
         window.resetQuickForm = function() {
             document.getElementById('quickDescription').value = '';
+            document.getElementById('quickPrice').value = '';
             document.getElementById('previewContainer').classList.remove('active');
             document.getElementById('previewGrid').innerHTML = '';
             document.getElementById('isPremium').checked = false;
@@ -1381,6 +1430,7 @@
                 const vehicleName = firstLine.length > 60 ? firstLine.substring(0, 60) + '…' : firstLine;
 
                 // Firebase n'accepte pas les valeurs undefined — on construit l'objet proprement
+                const priceVal = parseInt(document.getElementById('quickPrice').value) || null;
                 const vehicleData = {
                     name: vehicleName,
                     brand: firstLine.split(' ')[0] || 'Véhicule',
@@ -1395,6 +1445,7 @@
                     mileage: 0,
                     createdAt: Date.now()
                 };
+                if (priceVal) vehicleData.price = priceVal;
 
                 // N'ajouter videoUrl que s'il existe (Firebase refuse undefined)
                 if (videoUrl) vehicleData.videoUrl = videoUrl;
@@ -1440,25 +1491,21 @@
                 }
                 
                 list.innerHTML = '';
-                Object.keys(data).forEach(key => {
+                Object.keys(data).reverse().forEach(key => {
                     const v = data[key];
                     const item = document.createElement('div');
                     item.className = 'vehicle-item';
+                    const priceDisplay = v.price ? v.price.toLocaleString('fr-FR') + ' FCFA' : '<span style="color:rgba(255,255,255,0.4);font-size:0.85rem;">Prix non défini</span>';
                     item.innerHTML = `
-                        <img src="${v.imageUrl || 'https://via.placeholder.com/80x60'}" class="vehicle-thumb" alt="${v.name}">
+                        <img src="${v.imageUrl || 'https://via.placeholder.com/80x60/1a1a1a/c9a961?text=AUTO'}" class="vehicle-thumb" alt="${v.name}">
                         <div class="vehicle-info">
-                            <h4>${v.brand} ${v.name}</h4>
-                            <p>${v.year} • ${v.mileage?.toLocaleString() || 0} km • ${v.fuel}</p>
+                            <h4>${v.name || 'Véhicule'}</h4>
+                            <p style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-top:3px;">${v.available ? '✅ Disponible' : '🔴 Réservé'}${v.premium ? ' • ⭐ Premium' : ''}${v.new ? ' • 🆕 Nouveau' : ''}</p>
                         </div>
-                        <div class="vehicle-price">${v.price?.toLocaleString('fr-FR')} €</div>
-                        <div>
-                            <span class="vehicle-status ${v.available ? 'status-active' : 'status-pending'}">
-                                ${v.available ? 'Disponible' : 'Réservé'}
-                            </span>
-                        </div>
+                        <div class="vehicle-price" style="font-size:0.95rem;">${priceDisplay}</div>
                         <div class="vehicle-actions">
-                            <button class="action-btn" onclick="showToast('info', 'Édition', 'Fonctionnalité à venir')" title="Modifier">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <button class="action-btn" onclick="openEditModal('${key}')" title="Modifier" style="background:rgba(201,169,97,0.15);">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--doré)" stroke-width="2">
                                     <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
                                     <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
                                 </svg>
@@ -1475,6 +1522,70 @@
                 });
             }, { onlyOnce: true });
         }
+
+        // Edit modal
+        let currentEditId = null;
+
+        window.openEditModal = function(id) {
+            currentEditId = id;
+            const vehicleRef = ref(database, 'vehicles/' + id);
+            onValue(vehicleRef, (snapshot) => {
+                const v = snapshot.val();
+                if (!v) return;
+                document.getElementById('editPrice').value = v.price || '';
+                document.getElementById('editDescription').value = v.description || '';
+                document.getElementById('editPremium').checked = !!v.premium;
+                document.getElementById('editNew').checked = !!v.new;
+                document.getElementById('editAvailable').checked = !!v.available;
+                document.getElementById('editModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }, { onlyOnce: true });
+        };
+
+        window.closeEditModal = function() {
+            document.getElementById('editModal').style.display = 'none';
+            document.body.style.overflow = '';
+            currentEditId = null;
+        };
+
+        window.saveEdit = async function() {
+            if (!currentEditId) return;
+            const btn = document.getElementById('saveEditBtn');
+            btn.disabled = true;
+            btn.textContent = 'Enregistrement...';
+
+            try {
+                const priceVal = parseInt(document.getElementById('editPrice').value) || null;
+                const description = document.getElementById('editDescription').value.trim();
+                const firstLine = description.split('\n')[0].trim();
+
+                const updates = {
+                    description: description,
+                    name: firstLine.length > 60 ? firstLine.substring(0, 60) + '…' : firstLine,
+                    brand: firstLine.split(' ')[0] || 'Véhicule',
+                    premium: document.getElementById('editPremium').checked,
+                    new: document.getElementById('editNew').checked,
+                    available: document.getElementById('editAvailable').checked,
+                    updatedAt: Date.now()
+                };
+                if (priceVal) updates.price = priceVal;
+                else updates.price = null;
+
+                await set(ref(database, 'vehicles/' + currentEditId), 
+                    Object.assign({}, await new Promise(res => onValue(ref(database, 'vehicles/' + currentEditId), s => res(s.val()), { onlyOnce: true })), 
+                    updates)
+                );
+
+                showToast('success', 'Modifications enregistrées', 'Le véhicule a été mis à jour.');
+                closeEditModal();
+                loadVehicles();
+            } catch (err) {
+                showToast('error', 'Erreur', err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Enregistrer les modifications';
+            }
+        };
 
         function updateStats() {
             onValue(ref(database, 'vehicles'), (snapshot) => {
