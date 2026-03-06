@@ -974,12 +974,17 @@
                         Détails du véhicule
                     </h3>
                     
-                    <!-- Prix -->
+                    <!-- Prix + Devise -->
                     <div class="form-group" style="margin-bottom: 25px;">
-                        <label class="form-label">💰 Prix du véhicule (FCFA)</label>
-                        <div style="position:relative;">
-                            <input type="number" class="form-input" id="quickPrice" placeholder="Ex: 12500000" min="0" style="padding-right: 70px; font-size: 1.05rem;">
-                            <span style="position:absolute; right:15px; top:50%; transform:translateY(-50%); color:var(--doré); font-weight:600; font-size:0.85rem; pointer-events:none;">FCFA</span>
+                        <label class="form-label">💰 Prix du véhicule</label>
+                        <div style="display:flex; gap:10px; align-items:stretch;">
+                            <input type="number" class="form-input" id="quickPrice" placeholder="Ex: 12500000" min="0" style="flex:1; font-size:1.05rem;">
+                            <select id="quickCurrency" class="form-select" style="width:120px; flex-shrink:0; font-weight:600; color:var(--doré); background:var(--gris-moyen);">
+                                <option value="FCFA">FCFA</option>
+                                <option value="USD">$ Dollar</option>
+                                <option value="EUR">€ Euro</option>
+                                <option value="JPY">¥ Yen</option>
+                            </select>
                         </div>
                         <p style="color: rgba(255,255,255,0.4); font-size: 0.8rem; margin-top: 6px;">Laissez vide si le prix est à négocier</p>
                     </div>
@@ -1115,10 +1120,15 @@
             <h2 style="font-family:'Playfair Display',serif; color:var(--doré); margin-bottom:30px; font-size:1.5rem;">✏️ Modifier le véhicule</h2>
 
             <div class="form-group" style="margin-bottom:20px;">
-                <label class="form-label">💰 Prix (FCFA)</label>
-                <div style="position:relative;">
-                    <input type="number" class="form-input" id="editPrice" placeholder="Ex: 12500000" min="0" style="padding-right:70px;">
-                    <span style="position:absolute;right:15px;top:50%;transform:translateY(-50%);color:var(--doré);font-weight:600;font-size:0.85rem;pointer-events:none;">FCFA</span>
+                <label class="form-label">💰 Prix</label>
+                <div style="display:flex; gap:10px; align-items:stretch;">
+                    <input type="number" class="form-input" id="editPrice" placeholder="Ex: 12500000" min="0" style="flex:1;">
+                    <select id="editCurrency" class="form-select" style="width:120px; flex-shrink:0; font-weight:600; color:var(--doré); background:var(--gris-moyen);">
+                        <option value="FCFA">FCFA</option>
+                        <option value="USD">$ Dollar</option>
+                        <option value="EUR">€ Euro</option>
+                        <option value="JPY">¥ Yen</option>
+                    </select>
                 </div>
             </div>
 
@@ -1373,6 +1383,7 @@
         window.resetQuickForm = function() {
             document.getElementById('quickDescription').value = '';
             document.getElementById('quickPrice').value = '';
+            document.getElementById('quickCurrency').value = 'FCFA';
             document.getElementById('previewContainer').classList.remove('active');
             document.getElementById('previewGrid').innerHTML = '';
             document.getElementById('isPremium').checked = false;
@@ -1431,6 +1442,7 @@
 
                 // Firebase n'accepte pas les valeurs undefined — on construit l'objet proprement
                 const priceVal = parseInt(document.getElementById('quickPrice').value) || null;
+                const currency = document.getElementById('quickCurrency').value || 'FCFA';
                 const vehicleData = {
                     name: vehicleName,
                     brand: firstLine.split(' ')[0] || 'Véhicule',
@@ -1441,6 +1453,7 @@
                     imageUrl: imageUrl,
                     images: images.length > 0 ? images : null,
                     hasVideo: !!videoUrl,
+                    currency: currency,
                     year: new Date().getFullYear(),
                     mileage: 0,
                     createdAt: Date.now()
@@ -1495,7 +1508,9 @@
                     const v = data[key];
                     const item = document.createElement('div');
                     item.className = 'vehicle-item';
-                    const priceDisplay = v.price ? v.price.toLocaleString('fr-FR') + ' FCFA' : '<span style="color:rgba(255,255,255,0.4);font-size:0.85rem;">Prix non défini</span>';
+                    const priceDisplay = v.price 
+                        ? v.price.toLocaleString('fr-FR') + ' ' + (v.currency || 'FCFA')
+                        : '<span style="color:rgba(255,255,255,0.4);font-size:0.85rem;">Prix non défini</span>';
                     item.innerHTML = `
                         <img src="${v.imageUrl || 'https://via.placeholder.com/80x60/1a1a1a/c9a961?text=AUTO'}" class="vehicle-thumb" alt="${v.name}">
                         <div class="vehicle-info">
@@ -1533,6 +1548,7 @@
                 const v = snapshot.val();
                 if (!v) return;
                 document.getElementById('editPrice').value = v.price || '';
+                document.getElementById('editCurrency').value = v.currency || 'FCFA';
                 document.getElementById('editDescription').value = v.description || '';
                 document.getElementById('editPremium').checked = !!v.premium;
                 document.getElementById('editNew').checked = !!v.new;
@@ -1556,6 +1572,7 @@
 
             try {
                 const priceVal = parseInt(document.getElementById('editPrice').value) || null;
+                const currency = document.getElementById('editCurrency').value || 'FCFA';
                 const description = document.getElementById('editDescription').value.trim();
                 const firstLine = description.split('\n')[0].trim();
 
@@ -1566,6 +1583,7 @@
                     premium: document.getElementById('editPremium').checked,
                     new: document.getElementById('editNew').checked,
                     available: document.getElementById('editAvailable').checked,
+                    currency: currency,
                     updatedAt: Date.now()
                 };
                 if (priceVal) updates.price = priceVal;
