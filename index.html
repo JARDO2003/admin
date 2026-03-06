@@ -1350,31 +1350,37 @@
             progressFill.style.width = '0%';
 
             try {
-                // Upload images vers Cloudinary
-                const total = uploadedFiles.length;
-                let completed = 0;
+                // Upload images vers Cloudinary (seulement s'il y a des fichiers)
+                let images = [];
+                let videoUrl = null;
 
-                const uploadPromises = uploadedFiles.map((file) =>
-                    uploadToCloudinary(file, (pct) => {
-                        // Progression globale approximative
-                        const global = Math.round(((completed + pct / 100) / Math.max(total, 1)) * 100);
-                        progressFill.style.width = global + '%';
-                    }).then((result) => {
-                        completed++;
-                        progressFill.style.width = Math.round((completed / Math.max(total, 1)) * 100) + '%';
-                        return result;
-                    })
-                );
+                if (uploadedFiles.length > 0) {
+                    const total = uploadedFiles.length;
+                    let completed = 0;
 
-                const uploadedUrls = await Promise.all(uploadPromises);
-                const images = uploadedUrls.filter(u => u.type.startsWith('image/')).map(u => u.url);
+                    const uploadPromises = uploadedFiles.map((file) =>
+                        uploadToCloudinary(file, (pct) => {
+                            const global = Math.round(((completed + pct / 100) / Math.max(total, 1)) * 100);
+                            progressFill.style.width = global + '%';
+                        }).then((result) => {
+                            completed++;
+                            progressFill.style.width = Math.round((completed / Math.max(total, 1)) * 100) + '%';
+                            return result;
+                        })
+                    );
+
+                    const uploadedUrls = await Promise.all(uploadPromises);
+                    images = uploadedUrls.filter(u => u.type.startsWith('image/')).map(u => u.url);
+                    videoUrl = uploadedUrls.find(u => u.type.startsWith('video/'))?.url || null;
+                }
+
                 const imageUrl = images[0] || '';
-                const videoUrl = uploadedUrls.find(u => u.type.startsWith('video/'))?.url || '';
 
                 // Extraire un titre depuis la première ligne
                 const firstLine = description.split('\n')[0].trim();
                 const vehicleName = firstLine.length > 60 ? firstLine.substring(0, 60) + '…' : firstLine;
 
+                // Firebase n'accepte pas les valeurs undefined — on construit l'objet proprement
                 const vehicleData = {
                     name: vehicleName,
                     brand: firstLine.split(' ')[0] || 'Véhicule',
@@ -1383,13 +1389,15 @@
                     new: document.getElementById('isNew').checked,
                     available: document.getElementById('isAvailable').checked,
                     imageUrl: imageUrl,
-                    images: images.length > 0 ? images : undefined,
-                    videoUrl: videoUrl || undefined,
+                    images: images.length > 0 ? images : null,
                     hasVideo: !!videoUrl,
                     year: new Date().getFullYear(),
                     mileage: 0,
                     createdAt: Date.now()
                 };
+
+                // N'ajouter videoUrl que s'il existe (Firebase refuse undefined)
+                if (videoUrl) vehicleData.videoUrl = videoUrl;
 
                 const newVehicleRef = push(ref(database, 'vehicles'));
                 await set(newVehicleRef, vehicleData);
