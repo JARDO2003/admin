@@ -1,1030 +1,615 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin · Luxe Auto</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0c0c0e;
-  --surface:#141416;
-  --surface2:#1c1c20;
-  --border:rgba(255,255,255,.06);
-  --border-gold:rgba(197,163,98,.22);
-  --gold:#c5a362;
-  --gold2:#e2c989;
-  --gold-dim:rgba(197,163,98,.12);
-  --text:#f0eee8;
-  --text-2:rgba(240,238,232,.55);
-  --text-3:rgba(240,238,232,.28);
-  --red:#c0392b;
-  --green:#27a96c;
-  --font-body:'DM Sans',sans-serif;
-  --font-display:'Cormorant Garamond',serif;
-  --sidebar:64px;
-  --sidebar-open:240px;
-  --radius:10px;
-  --transition:.22s cubic-bezier(.4,0,.2,1);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>LUXE AUTO — Excellence Automobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+        :root{
+            --noir:#0a0a0a;--anthracite:#1a1a1a;--gris:#2d2d2d;
+            --blanc:#fff;--or:#c9a961;--or2:#e0c78c;--rouge:#c41e3a;--wa:#25D366;
+        }
+        html{font-size:14px;}
+        @media(min-width:360px){html{font-size:15px;}}
+        @media(min-width:400px){html{font-size:16px;}}
 
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+        body{font-family:'Montserrat',sans-serif;background:var(--noir);color:var(--blanc);overflow-x:hidden;line-height:1.5;}
 
-/* ── LAYOUT ── */
-.layout{display:flex;min-height:100vh}
+        /* LOADER */
+        .loader{position:fixed;inset:0;background:var(--noir);display:flex;justify-content:center;align-items:center;z-index:9999;transition:opacity .6s,visibility .6s;}
+        .loader.hidden{opacity:0;visibility:hidden;}
+        .loader-logo{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--or);letter-spacing:.2em;animation:pulse 2s infinite;}
+        .loader-line{width:0;height:2px;background:linear-gradient(90deg,transparent,var(--or),transparent);margin:15px auto 0;animation:loadLine 1.5s ease-out forwards;}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+        @keyframes loadLine{to{width:150px}}
 
-/* ── SIDEBAR ── */
-.sidebar{
-  width:var(--sidebar-open);
-  background:var(--surface);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  position:fixed;top:0;left:0;height:100vh;z-index:200;
-  overflow:hidden;
-  transition:width var(--transition),transform var(--transition);
-}
-.sidebar.collapsed{width:var(--sidebar)}
-.s-head{
-  padding:26px 20px 22px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:12px;
-  min-height:72px;flex-shrink:0;
-}
-.s-logo-icon{
-  width:34px;height:34px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  border-radius:8px;display:flex;align-items:center;justify-content:center;
-}
-.s-logo-icon svg{width:18px;height:18px;stroke:#0c0c0e;stroke-width:2.2;fill:none}
-.s-logo-text{
-  font-family:var(--font-display);font-size:1.35rem;letter-spacing:.12em;
-  color:var(--gold);white-space:nowrap;overflow:hidden;
-  transition:opacity var(--transition),width var(--transition);
-}
-.sidebar.collapsed .s-logo-text{opacity:0;width:0}
-.s-toggle{
-  position:absolute;top:22px;right:-13px;
-  width:26px;height:26px;background:var(--surface2);
-  border:1px solid var(--border-gold);border-radius:50%;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:transform var(--transition),background var(--transition);
-  z-index:10;
-}
-.s-toggle:hover{background:var(--gold-dim)}
-.s-toggle svg{width:12px;height:12px;stroke:var(--gold);fill:none;stroke-width:2;transition:transform var(--transition)}
-.sidebar.collapsed .s-toggle svg{transform:rotate(180deg)}
-.s-nav{flex:1;padding:16px 10px;overflow-y:auto;overflow-x:hidden}
-.s-label{
-  font-size:.67rem;text-transform:uppercase;letter-spacing:.16em;
-  color:var(--text-3);padding:0 10px;margin:18px 0 8px;
-  white-space:nowrap;overflow:hidden;
-  transition:opacity var(--transition);
-}
-.sidebar.collapsed .s-label{opacity:0}
-.nav-btn{
-  display:flex;align-items:center;gap:13px;
-  padding:10px 10px;border-radius:var(--radius);
-  color:var(--text-2);cursor:pointer;border:none;
-  background:none;width:100%;font-family:var(--font-body);
-  font-size:.9rem;font-weight:500;text-align:left;
-  transition:background var(--transition),color var(--transition);
-  position:relative;white-space:nowrap;overflow:hidden;
-  margin-bottom:2px;min-height:42px;
-}
-.nav-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
-.nav-btn span{transition:opacity var(--transition);overflow:hidden}
-.sidebar.collapsed .nav-btn span{opacity:0}
-.nav-btn:hover{background:var(--gold-dim);color:var(--text)}
-.nav-btn.active{background:var(--gold-dim);color:var(--gold)}
-.nav-btn.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:2.5px;background:var(--gold);border-radius:2px}
-.nav-btn .badge{
-  margin-left:auto;background:var(--gold);color:#0c0c0e;
-  font-size:.68rem;font-weight:700;padding:2px 6px;border-radius:20px;
-  flex-shrink:0;transition:opacity var(--transition);
-}
-.sidebar.collapsed .badge{opacity:0}
-.s-foot{padding:14px 10px;border-top:1px solid var(--border)}
-.nav-btn.logout{color:rgba(192,57,43,.8)}
-.nav-btn.logout:hover{background:rgba(192,57,43,.1);color:var(--red)}
+        /* HEADER */
+        header{position:fixed;top:0;width:100%;padding:12px 4%;background:rgba(10,10,10,.97);backdrop-filter:blur(12px);z-index:1000;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(201,169,97,.18);}
+        .logo{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--or);text-decoration:none;letter-spacing:.1em;font-weight:600;}
 
-/* ── MAIN ── */
-.main{
-  margin-left:var(--sidebar-open);
-  width:calc(100% - var(--sidebar-open));
-  min-height:100vh;
-  transition:margin-left var(--transition),width var(--transition);
-}
-.sidebar.collapsed ~ .main{
-  margin-left:var(--sidebar);
-  width:calc(100% - var(--sidebar));
-}
+        /* MOBILE MENU */
+        .mob-btn{display:flex;flex-direction:column;gap:5px;width:35px;height:35px;cursor:pointer;z-index:1001;padding:5px;justify-content:center;}
+        .mob-btn span{width:22px;height:2px;background:var(--or);transition:all .3s;border-radius:1px;}
+        .mob-btn.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+        .mob-btn.active span:nth-child(2){opacity:0;}
+        .mob-btn.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
 
-/* ── TOPBAR ── */
-.topbar{
-  height:64px;background:var(--surface);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 28px;position:sticky;top:0;z-index:100;
-  backdrop-filter:blur(12px);
-}
-.topbar-left{display:flex;align-items:center;gap:16px}
-.mob-menu{display:none;width:38px;height:38px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;align-items:center;justify-content:center}
-.mob-menu svg{width:18px;height:18px;stroke:var(--text-2);fill:none;stroke-width:2}
-.breadcrumb{display:flex;align-items:center;gap:6px;color:var(--text-3);font-size:.85rem}
-.breadcrumb strong{color:var(--text);font-weight:500}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.top-btn{
-  height:36px;padding:0 14px;border-radius:8px;border:none;
-  font-family:var(--font-body);font-size:.83rem;font-weight:600;
-  cursor:pointer;display:flex;align-items:center;gap:7px;transition:all var(--transition);
-}
-.top-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;flex-shrink:0}
-.top-btn-ghost{background:var(--surface2);color:var(--text-2);border:1px solid var(--border)}
-.top-btn-ghost:hover{border-color:var(--border-gold);color:var(--text)}
-.top-btn-gold{background:var(--gold);color:#0c0c0e}
-.top-btn-gold:hover{background:var(--gold2);box-shadow:0 4px 20px rgba(197,163,98,.3)}
-.top-btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+        nav{position:fixed;top:0;right:-100%;width:80%;max-width:300px;height:100vh;background:var(--anthracite);flex-direction:column;padding-top:80px;transition:right .3s;z-index:999;border-left:1px solid rgba(201,169,97,.15);}
+        nav.active{right:0;}
+        nav ul{display:flex;flex-direction:column;list-style:none;}
+        nav li{border-bottom:1px solid rgba(255,255,255,.05);}
+        nav a{display:block;color:var(--blanc);text-decoration:none;font-size:.9rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:18px 25px;transition:all .3s;}
+        nav a:hover{background:rgba(201,169,97,.1);color:var(--or);padding-left:32px;}
 
-/* ── CONTENT ── */
-.content{padding:28px}
+        @media(min-width:1024px){
+            .mob-btn{display:none;}
+            nav{position:static;width:auto;height:auto;background:none;padding:0;border:none;right:0;}
+            nav ul{flex-direction:row;gap:30px;}
+            nav li{border:none;}
+            nav a{padding:6px 0;font-size:.82rem;}
+            nav a::after{content:'';display:block;height:1px;background:var(--or);width:0;transition:width .3s;}
+            nav a:hover::after{width:100%;}
+            nav a:hover{background:none;padding-left:0;}
+        }
 
-/* ── PAGE ── */
-.page{display:none;animation:fadeSlide .28s ease}
-.page.active{display:block}
-@keyframes fadeSlide{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+        /* HERO */
+        .hero{min-height:100vh;background:linear-gradient(135deg,var(--noir) 0%,#0f0f0f 40%,#111 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:100px 5% 60px;position:relative;overflow:hidden;}
+        .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 40%,rgba(201,169,97,.06) 0%,transparent 65%);pointer-events:none;}
+        .hero-badge{display:inline-block;background:rgba(201,169,97,.1);border:1px solid rgba(201,169,97,.3);color:var(--or);padding:8px 20px;border-radius:50px;font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:28px;}
+        .hero-title{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:400;line-height:1.2;margin-bottom:20px;max-width:800px;}
+        .hero-title span{color:var(--or);}
+        @media(min-width:1024px){.hero-title{font-size:3.5rem;}}
+        .hero-sub{color:rgba(255,255,255,.55);font-size:.95rem;max-width:550px;line-height:1.8;margin-bottom:40px;}
+        .hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+        .btn-or{padding:15px 32px;background:var(--or);color:var(--noir);border:none;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .3s;}
+        .btn-or:hover{background:var(--or2);transform:translateY(-2px);box-shadow:0 8px 25px rgba(201,169,97,.3);}
+        .btn-outline{padding:15px 32px;background:transparent;color:var(--blanc);border:1px solid rgba(255,255,255,.3);font-family:'Montserrat',sans-serif;font-weight:500;font-size:.9rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:4px;transition:all .3s;}
+        .btn-outline:hover{border-color:var(--or);color:var(--or);}
+        .scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,.3);font-size:.72rem;letter-spacing:.1em;}
+        .scroll-hint div{width:1px;height:40px;background:linear-gradient(to bottom,transparent,var(--or));animation:scrollDown 2s ease-in-out infinite;}
+        @keyframes scrollDown{0%,100%{opacity:.3}50%{opacity:1}}
 
-/* ── STATS ── */
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:28px}
-.stat-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--radius);padding:22px 20px;
-  transition:border-color var(--transition),transform var(--transition);
-  position:relative;overflow:hidden;
-}
-.stat-card::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,var(--gold-dim),transparent);
-  opacity:0;transition:opacity var(--transition);
-}
-.stat-card:hover{border-color:var(--border-gold);transform:translateY(-2px)}
-.stat-card:hover::after{opacity:1}
-.stat-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);margin-bottom:10px}
-.stat-value{font-family:var(--font-display);font-size:2.1rem;font-weight:500;color:var(--gold);line-height:1}
-.stat-change{font-size:.78rem;color:var(--green);margin-top:6px;display:flex;align-items:center;gap:4px}
-.stat-change svg{width:13px;height:13px;stroke:currentColor;fill:none}
+        /* CATALOGUE */
+        .catalogue{padding:80px 5%;background:var(--noir);}
+        .section-header{text-align:center;margin-bottom:50px;}
+        .section-tag{display:inline-block;color:var(--or);font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid rgba(201,169,97,.4);padding-bottom:6px;margin-bottom:16px;}
+        .section-title{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:400;margin-bottom:12px;}
+        .section-sub{color:rgba(255,255,255,.5);font-size:.9rem;}
 
-/* ── SECTION CARD ── */
-.section-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;overflow:hidden;margin-bottom:20px;
-}
-.section-header{
-  padding:20px 24px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-}
-.section-title{
-  font-family:var(--font-display);font-size:1.1rem;font-weight:500;
-  color:var(--text);display:flex;align-items:center;gap:10px;
-}
-.section-title svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:2}
-.section-body{padding:24px}
+        /* FILTER */
+        .filter-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:40px;}
+        .filter-btn{padding:9px 20px;border-radius:50px;background:var(--anthracite);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-family:'Montserrat',sans-serif;font-size:.8rem;cursor:pointer;transition:all .3s;}
+        .filter-btn:hover,.filter-btn.active{background:rgba(201,169,97,.15);border-color:var(--or);color:var(--or);}
 
-/* ── FORM ── */
-.field{margin-bottom:20px}
-.field-label{
-  display:block;font-size:.72rem;text-transform:uppercase;
-  letter-spacing:.12em;color:var(--gold);margin-bottom:9px;font-weight:600;
-}
-.field-hint{font-size:.76rem;color:var(--text-3);margin-top:5px}
-.f-input,.f-select,.f-textarea{
-  width:100%;background:var(--surface2);border:1px solid var(--border);
-  color:var(--text);font-family:var(--font-body);font-size:.9rem;
-  border-radius:8px;padding:11px 14px;transition:all var(--transition);
-  appearance:none;
-}
-.f-input:focus,.f-select:focus,.f-textarea:focus{
-  outline:none;border-color:rgba(197,163,98,.4);
-  box-shadow:0 0 0 3px rgba(197,163,98,.08);
-}
-.f-textarea{resize:vertical;min-height:180px;line-height:1.7}
-.f-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c5a362' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer}
-.f-row{display:flex;gap:10px}
-.f-row>.f-input,.f-row>.f-select{flex:1}
+        /* CARDS */
+        .cars-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:24px;}
+        @media(min-width:768px){.cars-grid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));}}
 
-/* ── PRICE MODE ── */
-.price-modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.price-mode{
-  padding:13px 14px;border-radius:9px;border:1px solid var(--border);
-  background:var(--surface2);cursor:pointer;text-align:left;
-  font-family:var(--font-body);color:var(--text-2);
-  font-size:.85rem;font-weight:500;transition:all var(--transition);
-  display:flex;align-items:center;gap:10px;
-}
-.price-mode:hover{border-color:var(--border-gold);color:var(--text)}
-.price-mode.active{border-color:var(--gold);background:var(--gold-dim);color:var(--gold)}
-.price-mode svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
-.pm-hidden{display:none}
-.pm-info{
-  background:rgba(197,163,98,.06);border:1px solid var(--border-gold);
-  border-radius:8px;padding:12px 16px;font-size:.82rem;color:rgba(197,163,98,.8);
-}
+        .car-card{background:var(--anthracite);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.06);transition:all .35s;cursor:pointer;}
+        .car-card:hover{transform:translateY(-6px);border-color:rgba(201,169,97,.3);box-shadow:0 20px 50px rgba(0,0,0,.4);}
+        .car-img{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--gris);}
+        .car-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s;}
+        .car-card:hover .car-img img{transform:scale(1.05);}
+        .car-badges{position:absolute;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;}
+        .badge{padding:4px 10px;border-radius:50px;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+        .badge-or{background:var(--or);color:var(--noir);}
+        .badge-new{background:rgba(76,175,80,.85);color:#fff;}
+        .badge-res{background:rgba(196,30,58,.85);color:#fff;}
+        .car-body{padding:20px;}
+        .car-name{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:6px;}
+        .car-desc{color:rgba(255,255,255,.5);font-size:.82rem;line-height:1.6;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+        .car-price{color:var(--or);font-weight:700;font-size:1rem;margin-bottom:16px;}
+        .car-price.negotiate{font-size:.88rem;color:rgba(201,169,97,.8);display:flex;align-items:center;gap:6px;}
+        .car-actions{display:flex;gap:8px;}
+        .car-detail-btn{flex:1;padding:11px;background:rgba(201,169,97,.1);border:1px solid rgba(201,169,97,.25);color:var(--or);font-family:'Montserrat',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;border-radius:6px;transition:all .3s;text-transform:uppercase;letter-spacing:.06em;}
+        .car-detail-btn:hover{background:var(--or);color:var(--noir);}
+        .car-wa-btn{padding:11px 14px;background:var(--wa);border:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .3s;}
+        .car-wa-btn:hover{opacity:.85;}
+        .car-wa-btn svg{width:18px;height:18px;fill:#fff;}
 
-/* ── TOGGLE CHECKBOXES ── */
-.checks{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
-.check-pill{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 14px;border-radius:40px;border:1px solid var(--border);
-  background:var(--surface2);cursor:pointer;
-  font-size:.83rem;font-weight:500;color:var(--text-2);
-  transition:all var(--transition);user-select:none;
-}
-.check-pill input{display:none}
-.check-pill:has(input:checked){border-color:var(--gold);background:var(--gold-dim);color:var(--gold)}
-.check-pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;opacity:.5}
-.check-pill:has(input:checked) .dot{opacity:1}
+        /* EMPTY STATE */
+        .empty-catalogue{text-align:center;padding:80px 20px;color:rgba(255,255,255,.35);}
+        .empty-catalogue svg{width:70px;height:70px;stroke:rgba(255,255,255,.12);margin:0 auto 20px;display:block;}
 
-/* ── UPLOAD ── */
-.drop-zone{
-  border:1.5px dashed var(--border);border-radius:10px;
-  padding:36px 20px;text-align:center;cursor:pointer;
-  background:var(--surface2);position:relative;
-  transition:all var(--transition);
-}
-.drop-zone:hover,.drop-zone.drag{border-color:var(--gold);background:rgba(197,163,98,.03)}
-.drop-zone.filled{border-color:var(--green);border-style:solid}
-.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.drop-icon{width:38px;height:38px;stroke:var(--gold);fill:none;margin:0 auto 10px;display:block}
-.drop-text{font-size:.87rem;color:var(--text-2);margin-bottom:4px}
-.drop-sub{font-size:.75rem;color:var(--text-3)}
-.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:14px}
-.prev-item{position:relative;aspect-ratio:16/10;border-radius:7px;overflow:hidden;border:1px solid var(--border)}
-.prev-item img,.prev-item video{width:100%;height:100%;object-fit:cover;display:block}
-.prev-rm{
-  position:absolute;top:4px;right:4px;
-  width:20px;height:20px;background:rgba(192,57,43,.9);
-  border:none;border-radius:50%;color:#fff;cursor:pointer;
-  font-size:.8rem;display:flex;align-items:center;justify-content:center;
-  opacity:0;transition:opacity var(--transition);
-}
-.prev-item:hover .prev-rm{opacity:1}
+        /* MODAL */
+        .modal{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:5000;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:all .3s;}
+        .modal.active{opacity:1;visibility:visible;}
+        .modal-box{background:var(--anthracite);border-radius:20px 20px 0 0;width:100%;max-width:700px;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .4s cubic-bezier(.25,.8,.25,1);}
+        .modal.active .modal-box{transform:none;}
+        @media(min-width:700px){
+            .modal{align-items:center;}
+            .modal-box{border-radius:20px;max-height:88vh;}
+        }
 
-/* ── PROGRESS ── */
-.prog{height:3px;background:var(--surface2);border-radius:2px;margin-top:12px;overflow:hidden;display:none}
-.prog.show{display:block}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));width:0%;transition:width .3s}
+        .modal-gallery{position:relative;aspect-ratio:16/10;background:var(--gris);overflow:hidden;}
+        .modal-gallery img{width:100%;height:100%;object-fit:cover;}
+        .gallery-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:background .2s;}
+        .gallery-nav:hover{background:rgba(201,169,97,.8);}
+        .gallery-nav.prev{left:12px;}
+        .gallery-nav.next{right:12px;}
+        .gallery-counter{position:absolute;bottom:10px;right:12px;background:rgba(0,0,0,.6);color:#fff;padding:3px 10px;border-radius:50px;font-size:.72rem;}
+        .gallery-thumbs{display:flex;gap:6px;padding:12px 16px;overflow-x:auto;background:rgba(0,0,0,.3);}
+        .gallery-thumb{width:55px;height:40px;object-fit:cover;border-radius:4px;cursor:pointer;opacity:.6;border:2px solid transparent;flex-shrink:0;transition:all .2s;}
+        .gallery-thumb.active{opacity:1;border-color:var(--or);}
 
-/* ── VEHICLES LIST ── */
-.vlist{}
-.vlist-head{
-  display:grid;grid-template-columns:60px 1fr 140px 100px 90px;
-  align-items:center;gap:14px;
-  padding:11px 20px;background:var(--surface2);
-  border-bottom:1px solid var(--border);
-  font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--text-3);
-}
-.vlist-item{
-  display:grid;grid-template-columns:60px 1fr 140px 100px 90px;
-  align-items:center;gap:14px;padding:14px 20px;
-  border-bottom:1px solid var(--border);
-  transition:background var(--transition);
-}
-.vlist-item:last-child{border-bottom:none}
-.vlist-item:hover{background:rgba(255,255,255,.02)}
-.v-thumb{width:60px;height:44px;object-fit:cover;border-radius:7px;background:var(--surface2);border:1px solid var(--border);display:block}
-.v-name{font-weight:500;font-size:.87rem;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.v-meta{font-size:.75rem;color:var(--text-3)}
-.v-price-col{font-weight:600;font-size:.85rem;color:var(--gold)}
-.v-status{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;padding:4px 9px;border-radius:30px}
-.v-status.avail{background:rgba(39,169,108,.12);color:var(--green)}
-.v-status.unavail{background:rgba(192,57,43,.1);color:rgba(192,57,43,.8)}
-.v-actions{display:flex;gap:6px;justify-content:flex-end}
-.icon-btn{
-  width:30px;height:30px;border-radius:7px;border:none;
-  background:var(--surface2);color:var(--text-3);
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all var(--transition);
-}
-.icon-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
-.icon-btn:hover{background:var(--gold-dim);color:var(--gold)}
-.icon-btn.del:hover{background:rgba(192,57,43,.12);color:var(--red)}
-.empty-state{padding:60px 20px;text-align:center;color:var(--text-3)}
-.empty-state svg{width:56px;height:56px;stroke:rgba(255,255,255,.1);fill:none;stroke-width:1;margin:0 auto 14px;display:block}
-.empty-state p{font-size:.9rem}
+        .modal-content{padding:22px 20px 30px;}
+        .modal-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+        .modal-title{font-family:'Playfair Display',serif;font-size:1.4rem;line-height:1.2;}
+        .modal-close{background:none;border:none;color:rgba(255,255,255,.5);font-size:1.8rem;cursor:pointer;line-height:1;padding:0 0 0 10px;flex-shrink:0;}
+        .modal-brand{color:rgba(255,255,255,.45);font-size:.82rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;}
+        .modal-price{font-size:1.25rem;font-weight:700;color:var(--or);margin-bottom:6px;}
+        .modal-price.negotiate{font-size:1rem;color:rgba(201,169,97,.85);display:flex;align-items:center;gap:8px;}
+        .modal-price-hint{font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:18px;}
+        .specs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+        .spec{background:var(--gris);border-radius:8px;padding:10px 14px;text-align:center;flex:1;min-width:80px;}
+        .spec-lbl{font-size:.7rem;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+        .spec-val{font-size:.88rem;font-weight:600;}
+        .modal-desc{color:rgba(255,255,255,.65);font-size:.88rem;line-height:1.8;margin-bottom:22px;white-space:pre-line;}
+        .modal-actions{display:flex;flex-direction:column;gap:10px;}
+        .modal-wa-btn{width:100%;padding:16px;background:var(--wa);border:none;color:#fff;font-family:'Montserrat',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .3s;}
+        .modal-wa-btn:hover{opacity:.88;}
+        .modal-wa-btn svg{width:22px;height:22px;fill:#fff;}
 
-/* ── MODAL ── */
-.modal-bg{
-  position:fixed;inset:0;background:rgba(0,0,0,.85);
-  z-index:500;display:flex;align-items:flex-start;justify-content:center;
-  padding:40px 16px;overflow-y:auto;
-  opacity:0;visibility:hidden;transition:all var(--transition);
-  backdrop-filter:blur(4px);
-}
-.modal-bg.open{opacity:1;visibility:visible}
-.modal{
-  background:var(--surface);border:1px solid var(--border-gold);
-  border-radius:14px;width:100%;max-width:600px;
-  padding:32px;position:relative;
-  transform:translateY(20px);transition:transform var(--transition);
-  margin:auto;
-}
-.modal-bg.open .modal{transform:none}
-.modal-close{
-  position:absolute;top:14px;right:16px;
-  background:none;border:none;color:var(--text-3);
-  font-size:1.6rem;cursor:pointer;line-height:1;
-  transition:color var(--transition);
-}
-.modal-close:hover{color:var(--text)}
-.modal-title{font-family:var(--font-display);font-size:1.3rem;color:var(--gold);margin-bottom:24px}
+        /* SERVICES */
+        .services{padding:80px 5%;background:var(--anthracite);}
+        .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px;margin-top:50px;}
+        .svc-card{padding:35px 28px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:all .3s;opacity:0;transform:translateY(20px);}
+        .svc-card.visible{opacity:1;transform:none;}
+        .svc-card:hover{border-color:rgba(201,169,97,.25);background:rgba(201,169,97,.04);}
+        .svc-icon{width:48px;height:48px;background:rgba(201,169,97,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+        .svc-icon svg{width:24px;height:24px;stroke:var(--or);}
+        .svc-title{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:10px;}
+        .svc-desc{color:rgba(255,255,255,.5);font-size:.85rem;line-height:1.7;}
 
-/* ── TOAST ── */
-.toast-wrap{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.toast{
-  background:var(--surface);border:1px solid var(--border);
-  border-left:3px solid var(--gold);border-radius:9px;
-  padding:13px 16px;min-width:260px;max-width:340px;
-  display:flex;align-items:flex-start;gap:11px;
-  pointer-events:all;
-  animation:toastIn .3s ease;box-shadow:0 10px 40px rgba(0,0,0,.5);
-}
-.toast.success{border-left-color:var(--green)}
-.toast.error{border-left-color:var(--red)}
-.toast.out{animation:toastOut .25s ease forwards}
-.toast svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;margin-top:2px}
-.toast.success svg{stroke:var(--green)}
-.toast.error svg{stroke:var(--red)}
-.toast.default svg{stroke:var(--gold)}
-.toast-title{font-size:.85rem;font-weight:600;margin-bottom:2px}
-.toast-msg{font-size:.78rem;color:var(--text-2)}
-@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
-@keyframes toastOut{to{opacity:0;transform:translateX(20px)}}
+        /* TESTIMONIALS */
+        .testimonials{padding:80px 5%;background:var(--noir);text-align:center;}
+        .testi-wrap{position:relative;max-width:680px;margin:40px auto 0;}
+        .testi{display:none;}
+        .testi.active{display:block;animation:fadeIn .4s;}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .testi-text{font-style:italic;color:rgba(255,255,255,.7);font-size:1.05rem;line-height:1.9;margin-bottom:28px;}
+        .testi-text::before{content:'"';font-family:'Playfair Display',serif;font-size:3rem;color:var(--or);display:block;margin-bottom:-10px;}
+        .testi-author{color:var(--or);font-weight:600;font-size:.9rem;}
+        .testi-dots{display:flex;justify-content:center;gap:8px;margin-top:24px;}
+        .testi-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .3s;border:none;}
+        .testi-dot.active{background:var(--or);width:24px;border-radius:4px;}
 
-/* ── SPINNER ── */
-.spin{
-  width:14px;height:14px;border:2px solid rgba(255,255,255,.15);
-  border-top-color:currentColor;border-radius:50%;
-  animation:rotate .65s linear infinite;display:none;flex-shrink:0;
-}
-.spin.on{display:inline-block}
-@keyframes rotate{to{transform:rotate(360deg)}}
+        /* CONTACT / FOOTER */
+        .footer{padding:60px 5% 30px;background:var(--anthracite);border-top:1px solid rgba(201,169,97,.1);}
+        .footer-grid{display:grid;gap:40px;margin-bottom:50px;}
+        @media(min-width:768px){.footer-grid{grid-template-columns:2fr 1fr 1fr 1fr;}}
+        .footer-brand{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--or);margin-bottom:14px;letter-spacing:.15em;}
+        .footer-tagline{color:rgba(255,255,255,.45);font-size:.85rem;line-height:1.7;}
+        .footer-heading{font-size:.78rem;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.4);margin-bottom:16px;}
+        .footer-links{list-style:none;display:flex;flex-direction:column;gap:10px;}
+        .footer-links a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.88rem;transition:color .3s;}
+        .footer-links a:hover{color:var(--or);}
+        .footer-contact{list-style:none;display:flex;flex-direction:column;gap:10px;}
+        .footer-contact li{font-size:.88rem;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:8px;}
+        .footer-contact a{color:rgba(255,255,255,.6);text-decoration:none;transition:color .3s;}
+        .footer-contact a:hover{color:var(--or);}
+        .footer-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:24px;text-align:center;color:rgba(255,255,255,.25);font-size:.78rem;}
 
-/* ── MOBILE OVERLAY ── */
-.sidebar-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
-  z-index:190;backdrop-filter:blur(2px);
-}
-
-/* ── RESPONSIVE ── */
-@media(max-width:900px){
-  :root{--sidebar-open:240px}
-  .sidebar{transform:translateX(-100%);width:var(--sidebar-open)!important;box-shadow:20px 0 60px rgba(0,0,0,.6)}
-  .sidebar.mobile-open{transform:none}
-  .sidebar-overlay{display:block;opacity:0;visibility:hidden;transition:all var(--transition)}
-  .sidebar-overlay.open{opacity:1;visibility:visible}
-  .s-toggle{display:none}
-  .main{margin-left:0!important;width:100%!important}
-  .mob-menu{display:flex}
-  .topbar{padding:0 16px}
-  .content{padding:16px}
-  .vlist-head,.vlist-item{grid-template-columns:50px 1fr 80px;gap:10px;padding:12px 14px}
-  .vlist-head .col-price,.vlist-head .col-status,
-  .vlist-item .v-price-col,.vlist-item .v-status-wrap{display:none}
-  .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}
-}
-@media(max-width:480px){
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .stat-card{padding:16px}
-  .stat-value{font-size:1.7rem}
-  .section-body{padding:16px}
-  .price-modes{grid-template-columns:1fr}
-  .modal{padding:22px}
-  .checks{gap:7px}
-}
-</style>
+        /* TOAST */
+        .toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9000;pointer-events:none;}
+        .toast{background:var(--anthracite);border:1px solid rgba(201,169,97,.3);color:var(--blanc);padding:13px 22px;border-radius:50px;font-size:.85rem;text-align:center;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:all;}
+        .toast.show{opacity:1;transform:none;}
+    </style>
 </head>
 <body>
 
-<!-- SIDEBAR OVERLAY -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileMenu()"></div>
-
-<!-- LAYOUT -->
-<div class="layout">
-
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
-  <div class="s-head">
-    <div class="s-logo-icon">
-      <svg viewBox="0 0 24 24"><path d="M3 17l2-7h14l2 7"/><path d="M2 17h20v2a1 1 0 01-1 1H3a1 1 0 01-1-1v-2z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
-    </div>
-    <div class="s-logo-text">LUXE AUTO</div>
-  </div>
-  <button class="s-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Réduire">
-    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
-
-  <nav class="s-nav">
-    <div class="s-label">Navigation</div>
-    <button class="nav-btn active" id="nav-dashboard" onclick="showPage('dashboard',this)">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <span>Tableau de bord</span>
-    </button>
-    <button class="nav-btn" id="nav-add" onclick="showPage('add',this)">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
-      <span>Publier un véhicule</span>
-    </button>
-    <button class="nav-btn" id="nav-list" onclick="showPage('list',this)">
-      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      <span>Inventaire</span>
-      <span class="badge" id="navBadge">—</span>
-    </button>
-  </nav>
-
-  <div class="s-foot">
-    <button class="nav-btn logout">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      <span>Déconnexion</span>
-    </button>
-  </div>
-</aside>
-
-<!-- MAIN -->
-<div class="main">
-
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <div class="topbar-left">
-      <button class="mob-menu" onclick="openMobileMenu()">
-        <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-      </button>
-      <div class="breadcrumb">
-        <span>Admin</span>
-        <span>›</span>
-        <strong id="breadcrumbTitle">Tableau de bord</strong>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <button class="top-btn top-btn-ghost" onclick="showPage('list',document.getElementById('nav-list'))">
-        <svg viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2"/></svg>
-        <span id="stockLabel">Stock</span>
-      </button>
-      <button class="top-btn top-btn-gold" onclick="showPage('add',document.getElementById('nav-add'))">
-        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-        Nouveau
-      </button>
-    </div>
-  </header>
-
-  <!-- CONTENT -->
-  <div class="content">
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Véhicules en stock</div>
-          <div class="stat-value" id="statTotal">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Vues ce mois</div>
-          <div class="stat-value">12.4K</div>
-          <div class="stat-change">
-            <svg viewBox="0 0 24 24"><polyline points="17 7 12 12 7 7"/></svg>
-            +28%
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Demandes reçues</div>
-          <div class="stat-value">48</div>
-          <div class="stat-change">
-            <svg viewBox="0 0 24 24"><polyline points="17 7 12 12 7 7"/></svg>
-            +5%
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Ventes réalisées</div>
-          <div class="stat-value">12</div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <div class="section-header">
-          <div class="section-title">
-            <svg viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/></svg>
-            Véhicules récents
-          </div>
-          <button class="top-btn top-btn-ghost" onclick="showPage('list',document.getElementById('nav-list'))">
-            Voir tout
-          </button>
-        </div>
-        <div id="dashboardVehicles">
-          <div class="empty-state"><p>Chargement…</p></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ADD VEHICLE -->
-    <div class="page" id="page-add">
-      <div class="section-card" style="max-width:720px">
-        <div class="section-header">
-          <div class="section-title">
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-            Informations du véhicule
-          </div>
-        </div>
-        <div class="section-body">
-
-          <div class="field">
-            <label class="field-label">Description complète *</label>
-            <textarea class="f-textarea" id="addDesc" placeholder="Ex : Mercedes-Benz GLE 2023&#10;Kilométrage : 18 000 km&#10;Couleur : Noir obsidienne&#10;Boîte : Automatique 9G&#10;Options : Toit panoramique, Sièges massage…"></textarea>
-            <div class="field-hint">La première ligne sera utilisée comme titre de l'annonce</div>
-          </div>
-
-          <div class="field">
-            <label class="field-label">Prix</label>
-            <div class="price-modes">
-              <button class="price-mode active" id="pm-mention" onclick="setPriceMode('mention')">
-                <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-                Afficher un prix
-              </button>
-              <button class="price-mode" id="pm-negocier" onclick="setPriceMode('negocier')">
-                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-                Prix à négocier
-              </button>
-            </div>
-            <div id="addPriceFields" class="f-row">
-              <input type="number" class="f-input" id="addPrice" placeholder="Ex : 12 500 000" min="0">
-              <select class="f-select" id="addCurrency" style="width:120px;flex:none">
-                <option value="FCFA">FCFA</option>
-                <option value="USD">$ Dollar</option>
-                <option value="EUR">€ Euro</option>
-                <option value="JPY">¥ Yen</option>
-              </select>
-            </div>
-            <div class="pm-info pm-hidden" id="addNegInfo">🤝 Les visiteurs seront invités à vous contacter pour connaître le prix</div>
-          </div>
-
-          <div class="field">
-            <label class="field-label">Photos & vidéos</label>
-            <div class="drop-zone" id="dropZone">
-              <input type="file" id="fileInput" multiple accept="image/*,video/*">
-              <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
-              <div class="drop-text">Glissez vos fichiers ou cliquez pour sélectionner</div>
-              <div class="drop-sub">JPG, PNG, MP4 · Taille libre</div>
-            </div>
-            <div class="prog" id="progBar"><div class="prog-fill" id="progFill"></div></div>
-            <div class="preview-grid" id="previewGrid"></div>
-          </div>
-
-          <div class="field">
-            <label class="field-label">Statut</label>
-            <div class="checks">
-              <label class="check-pill"><input type="checkbox" id="addPremium"><div class="dot"></div>⭐ Premium</label>
-              <label class="check-pill"><input type="checkbox" id="addIsNew"><div class="dot"></div>🆕 Nouveau</label>
-              <label class="check-pill"><input type="checkbox" id="addAvail" checked><div class="dot"></div>✅ Disponible</label>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:10px;margin-top:8px">
-            <button class="top-btn top-btn-ghost" onclick="resetAddForm()">
-              <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 019-9 9 9 0 010 18 9 9 0 01-9-9"/><polyline points="3 3 3 9 9 9"/></svg>
-              Réinitialiser
-            </button>
-            <button class="top-btn top-btn-gold" id="publishBtn" onclick="publishVehicle()">
-              <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9z"/></svg>
-              Publier l'annonce
-              <div class="spin" id="publishSpin"></div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- LIST -->
-    <div class="page" id="page-list">
-      <div class="section-card">
-        <div class="section-header">
-          <div class="section-title">
-            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-            Inventaire
-          </div>
-          <button class="top-btn top-btn-ghost" onclick="loadVehicles()">
-            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-            Actualiser
-          </button>
-        </div>
-        <div id="vehiclesList">
-          <div class="empty-state"><p>Chargement…</p></div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /content -->
-</div><!-- /main -->
-</div><!-- /layout -->
-
-<!-- EDIT MODAL -->
-<div class="modal-bg" id="editModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeEdit()">×</button>
-    <div class="modal-title">Modifier le véhicule</div>
-
-    <div class="field">
-      <label class="field-label">Description</label>
-      <textarea class="f-textarea" id="editDesc" style="min-height:160px"></textarea>
-    </div>
-
-    <div class="field">
-      <label class="field-label">Prix</label>
-      <div class="price-modes">
-        <button class="price-mode active" id="epm-mention" onclick="setEditPriceMode('mention')">
-          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-          Prix fixe
-        </button>
-        <button class="price-mode" id="epm-negocier" onclick="setEditPriceMode('negocier')">
-          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-          À négocier
-        </button>
-      </div>
-      <div id="editPriceFields" class="f-row">
-        <input type="number" class="f-input" id="editPrice" placeholder="Prix" min="0">
-        <select class="f-select" id="editCurrency" style="width:120px;flex:none">
-          <option value="FCFA">FCFA</option>
-          <option value="USD">$ Dollar</option>
-          <option value="EUR">€ Euro</option>
-          <option value="JPY">¥ Yen</option>
-        </select>
-      </div>
-      <div class="pm-info pm-hidden" id="editNegInfo">🤝 Les visiteurs seront invités à vous contacter pour connaître le prix</div>
-    </div>
-
-    <div class="field">
-      <label class="field-label">Statut</label>
-      <div class="checks">
-        <label class="check-pill"><input type="checkbox" id="editPremium"><div class="dot"></div>⭐ Premium</label>
-        <label class="check-pill"><input type="checkbox" id="editIsNew"><div class="dot"></div>🆕 Nouveau</label>
-        <label class="check-pill"><input type="checkbox" id="editAvail"><div class="dot"></div>✅ Disponible</label>
-      </div>
-    </div>
-
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
-      <button class="top-btn top-btn-ghost" onclick="closeEdit()">Annuler</button>
-      <button class="top-btn top-btn-gold" id="saveEditBtn" onclick="saveEdit()">
-        <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v14z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Enregistrer
-        <div class="spin" id="saveSpin"></div>
-      </button>
-    </div>
-  </div>
+<div class="loader" id="loader">
+    <div><div class="loader-logo">LUXE AUTO</div><div class="loader-line"></div></div>
 </div>
 
-<div class="toast-wrap" id="toastWrap"></div>
+<header>
+    <a href="#" class="logo">LUXE AUTO</a>
+    <button class="mob-btn" id="mobBtn" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+    </button>
+    <nav id="nav">
+        <ul>
+            <li><a href="#catalogue" onclick="closeMenu()">Catalogue</a></li>
+            <li><a href="#services" onclick="closeMenu()">Services</a></li>
+            <li><a href="#temoignages" onclick="closeMenu()">Avis</a></li>
+            <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
+        </ul>
+    </nav>
+</header>
 
-<script type="module">
-import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAnalytics }   from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-import { getDatabase, ref, push, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+<section class="hero">
+    <div class="hero-badge">Concessionnaire de luxe — Abidjan</div>
+    <h1 class="hero-title">L'Excellence Automobile<br><span>à votre portée</span></h1>
+    <p class="hero-sub">Des véhicules d'exception sélectionnés avec soin pour les connaisseurs. Découvrez notre collection exclusive.</p>
+    <div class="hero-btns">
+        <button class="btn-or" onclick="document.getElementById('catalogue').scrollIntoView({behavior:'smooth'})">Voir le catalogue</button>
+        <button class="btn-outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Nous contacter</button>
+    </div>
+    <div class="scroll-hint"><span>DÉFILER</span><div></div></div>
+</section>
 
-const FB = {
-  apiKey:"AIzaSyCPGgtXoDUycykLaTSee0S0yY0tkeJpqKI",
-  authDomain:"data-com-a94a8.firebaseapp.com",
-  databaseURL:"https://data-com-a94a8-default-rtdb.firebaseio.com",
-  projectId:"data-com-a94a8",
-  storageBucket:"data-com-a94a8.firebasestorage.app",
-  messagingSenderId:"276904640935",
-  appId:"1:276904640935:web:9cd805aeba6c34c767f682",
-  measurementId:"G-FYQCWY5G4S"
-};
-const CLOUD = { name:'djxcqczh1', preset:'database' };
+<section class="catalogue" id="catalogue">
+    <div class="section-header">
+        <div class="section-tag">Notre sélection</div>
+        <h2 class="section-title">Véhicules disponibles</h2>
+        <p class="section-sub">Des véhicules d'exception, soigneusement sélectionnés</p>
+    </div>
 
-const app = initializeApp(FB);
-getAnalytics(app);
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterVehicles('all',this)">Tous</button>
+        <button class="filter-btn" onclick="filterVehicles('available',this)">Disponibles</button>
+        <button class="filter-btn" onclick="filterVehicles('premium',this)">Premium</button>
+        <button class="filter-btn" onclick="filterVehicles('new',this)">Nouveautés</button>
+    </div>
+
+    <div class="cars-grid" id="carsGrid">
+        <div class="empty-catalogue" style="grid-column:1/-1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/></svg>
+            <p>Chargement des véhicules...</p>
+        </div>
+    </div>
+</section>
+
+<section class="services" id="services">
+    <div class="section-header">
+        <div class="section-tag">Ce que nous offrons</div>
+        <h2 class="section-title">Nos services</h2>
+    </div>
+    <div class="services-grid">
+        <div class="svc-card">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+            <h3 class="svc-title">Véhicules Garantis</h3>
+            <p class="svc-desc">Chaque véhicule est rigoureusement inspecté et documenté avant d'intégrer notre stock.</p>
+        </div>
+        <div class="svc-card">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 9V7a5 5 0 00-10 0v2M5 9h14l1 12H4L5 9z"/></svg></div>
+            <h3 class="svc-title">Financement</h3>
+            <p class="svc-desc">Solutions de financement adaptées à votre situation pour faciliter votre acquisition.</p>
+        </div>
+        <div class="svc-card">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 7h12m-12 4h12m-12 4h8M4 7h.01M4 11h.01M4 15h.01"/></svg></div>
+            <h3 class="svc-title">Conseil Personnalisé</h3>
+            <p class="svc-desc">Notre équipe vous guide pour trouver le véhicule parfaitement adapté à vos besoins.</p>
+        </div>
+        <div class="svc-card">
+            <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <h3 class="svc-title">Service Premium</h3>
+            <p class="svc-desc">Un accompagnement d'exception à chaque étape de votre projet automobile.</p>
+        </div>
+    </div>
+</section>
+
+<section class="testimonials" id="temoignages">
+    <div class="section-header">
+        <div class="section-tag">Ce qu'ils disent</div>
+        <h2 class="section-title">Témoignages</h2>
+    </div>
+    <div class="testi-wrap">
+        <div class="testi active">
+            <p class="testi-text">Un service impeccable, une équipe professionnelle et des véhicules en parfait état. Je recommande vivement Luxe Auto à tous ceux qui cherchent la qualité.</p>
+            <div class="testi-author">Kofi A. — Abidjan</div>
+        </div>
+        <div class="testi">
+            <p class="testi-text">J'ai trouvé exactement le véhicule que je cherchais. Le processus était simple et transparent. Merci à toute l'équipe de Luxe Auto !</p>
+            <div class="testi-author">Aminata B. — Cocody</div>
+        </div>
+        <div class="testi">
+            <p class="testi-text">Luxe Auto, c'est la référence à Abidjan pour les véhicules de prestige. Qualité, sérieux et confiance. Une expérience vraiment premium.</p>
+            <div class="testi-author">Jean-Paul M. — Plateau</div>
+        </div>
+        <div class="testi-dots">
+            <button class="testi-dot active" onclick="showTesti(0)"></button>
+            <button class="testi-dot" onclick="showTesti(1)"></button>
+            <button class="testi-dot" onclick="showTesti(2)"></button>
+        </div>
+    </div>
+</section>
+
+<footer class="footer" id="contact">
+    <div class="footer-grid">
+        <div>
+            <div class="footer-brand">LUXE AUTO</div>
+            <p class="footer-tagline">Votre concessionnaire premium à Abidjan. Excellence, confiance et passion automobile depuis des années.</p>
+        </div>
+        <div>
+            <div class="footer-heading">Navigation</div>
+            <ul class="footer-links">
+                <li><a href="#catalogue">Catalogue</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#temoignages">Avis clients</a></li>
+            </ul>
+        </div>
+        <div>
+            <div class="footer-heading">Contact</div>
+            <ul class="footer-contact">
+                <li>📍 Côte d'Ivoire, Abidjan</li>
+                <li>📞 <a href="tel:0172369840">0172369840</a></li>
+                <li>✉️ <a href="mailto:zinzindohouemarcio@gmail.com">zinzindohouemarcio@gmail.com</a></li>
+            </ul>
+        </div>
+        <div>
+            <div class="footer-heading">WhatsApp</div>
+            <ul class="footer-contact">
+                <li>Écrivez-nous directement sur WhatsApp pour toute question ou demande.</li>
+            </ul>
+            <div style="margin-top:14px;">
+                <a href="https://wa.me/2250172369840" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;font-size:.85rem;font-weight:600;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    Écrire sur WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">© 2025 LUXE AUTO — Tous droits réservés</div>
+</footer>
+
+<!-- VEHICLE MODAL -->
+<div class="modal" id="vehicleModal" onclick="closeModalBg(event)">
+    <div class="modal-box">
+        <div class="modal-gallery" id="modalGallery">
+            <img id="modalMainImg" src="" alt="">
+            <button class="gallery-nav prev" onclick="changeImg(-1)">‹</button>
+            <button class="gallery-nav next" onclick="changeImg(1)">›</button>
+            <div class="gallery-counter" id="galleryCounter">1 / 1</div>
+        </div>
+        <div class="gallery-thumbs" id="galleryThumbs"></div>
+
+        <div class="modal-content">
+            <div class="modal-top">
+                <div>
+                    <h2 class="modal-title" id="modalTitle"></h2>
+                    <div class="modal-brand" id="modalBrand"></div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+
+            <div id="modalPriceWrap"></div>
+
+            <div class="specs" id="modalSpecs"></div>
+            <p class="modal-desc" id="modalDesc"></p>
+
+            <div class="modal-actions">
+                <button class="modal-wa-btn" onclick="waFromModal()">
+                    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    Je suis intéressé — Contacter sur WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-wrap"><div class="toast" id="toast"></div></div>
+
+<script data-cfasync="false" type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const app = initializeApp({
+    apiKey:"AIzaSyCPGgtXoDUycykLaTSee0S0yY0tkeJpqKI",
+    authDomain:"data-com-a94a8.firebaseapp.com",
+    databaseURL:"https://data-com-a94a8-default-rtdb.firebaseio.com",
+    projectId:"data-com-a94a8",
+    storageBucket:"data-com-a94a8.firebasestorage.app",
+    messagingSenderId:"276904640935",
+    appId:"1:276904640935:web:9cd805aeba6c34c767f682",
+    measurementId:"G-FYQCWY5G4S"
+});
 const db = getDatabase(app);
 
-/* ── TOAST ── */
-window.toast = (type, title, msg) => {
-  const icons = {
-    success:`<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>`,
-    error:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
-    default:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r="1" fill="currentColor"/></svg>`
-  };
-  const t = document.createElement('div');
-  t.className = `toast ${type}`;
-  t.innerHTML = `${icons[type]||icons.default}<div><div class="toast-title">${title}</div><div class="toast-msg">${msg}</div></div>`;
-  document.getElementById('toastWrap').appendChild(t);
-  setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(),280); }, 3800);
-};
+let allVehicles = [];
+let currentVehicle = null;
+let vehicleImages = [];
+let imgIndex = 0;
+let touchStartX = 0, touchEndX = 0;
 
-/* ── SIDEBAR ── */
-let sidebarCollapsed = false;
-window.toggleSidebar = () => {
-  sidebarCollapsed = !sidebarCollapsed;
-  document.getElementById('sidebar').classList.toggle('collapsed', sidebarCollapsed);
-};
-window.openMobileMenu = () => {
-  document.getElementById('sidebar').classList.add('mobile-open');
-  document.getElementById('sidebarOverlay').classList.add('open');
-};
-window.closeMobileMenu = () => {
-  document.getElementById('sidebar').classList.remove('mobile-open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
-};
-
-/* ── PAGES ── */
-const pageNames = { dashboard:'Tableau de bord', add:'Nouveau véhicule', list:'Inventaire' };
-window.showPage = (name, btn) => {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  if (btn) btn.classList.add('active');
-  else document.getElementById('nav-'+name)?.classList.add('active');
-  document.getElementById('breadcrumbTitle').textContent = pageNames[name]||'';
-  if (name === 'list') loadVehicles();
-  if (name === 'dashboard') loadDashboard();
-  closeMobileMenu();
-};
-
-/* ── PRICE MODES (add) ── */
-let priceMode = 'mention';
-window.setPriceMode = mode => {
-  priceMode = mode;
-  document.getElementById('pm-mention').classList.toggle('active', mode==='mention');
-  document.getElementById('pm-negocier').classList.toggle('active', mode==='negocier');
-  document.getElementById('addPriceFields').classList.toggle('pm-hidden', mode!=='mention');
-  document.getElementById('addNegInfo').classList.toggle('pm-hidden', mode!=='negocier');
-  if (mode==='negocier') document.getElementById('addPrice').value='';
-};
-
-/* ── PRICE MODES (edit) ── */
-let editPriceMode = 'mention';
-window.setEditPriceMode = mode => {
-  editPriceMode = mode;
-  document.getElementById('epm-mention').classList.toggle('active', mode==='mention');
-  document.getElementById('epm-negocier').classList.toggle('active', mode==='negocier');
-  document.getElementById('editPriceFields').classList.toggle('pm-hidden', mode!=='mention');
-  document.getElementById('editNegInfo').classList.toggle('pm-hidden', mode!=='negocier');
-  if (mode==='negocier') document.getElementById('editPrice').value='';
-};
-
-/* ── RESET ── */
-window.resetAddForm = () => {
-  document.getElementById('addDesc').value='';
-  document.getElementById('addPrice').value='';
-  document.getElementById('addCurrency').value='FCFA';
-  setPriceMode('mention');
-  document.getElementById('addPremium').checked=false;
-  document.getElementById('addIsNew').checked=false;
-  document.getElementById('addAvail').checked=true;
-  document.getElementById('previewGrid').innerHTML='';
-  document.getElementById('dropZone').classList.remove('filled');
-  uploadedFiles=[];
-};
-
-/* ── FILE UPLOAD ── */
-let uploadedFiles = [];
-const zone = document.getElementById('dropZone');
-const fi = document.getElementById('fileInput');
-
-zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
-zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
-zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
-fi.addEventListener('change', e => handleFiles(e.target.files));
-
-function handleFiles(files) {
-  Array.from(files).forEach(f => {
-    if (!f.type.match(/image.*|video.*/)) { toast('error','Format invalide','Images et vidéos uniquement'); return; }
-    uploadedFiles.push(f);
-    const r = new FileReader();
-    r.onload = e => {
-      const wrap = document.createElement('div');
-      wrap.className = 'prev-item';
-      const tag = f.type.startsWith('image/') ? 'img' : 'video';
-      wrap.innerHTML = `<${tag} src="${e.target.result}"><button class="prev-rm" onclick="rmFile(this,'${f.name}')">×</button>`;
-      document.getElementById('previewGrid').appendChild(wrap);
-    };
-    r.readAsDataURL(f);
-  });
-  if (uploadedFiles.length) zone.classList.add('filled');
+/* ─── HELPERS ─── */
+function priceLabel(v) {
+    if (v.negotiate) return null; // null = négocier
+    if (v.price) return v.price.toLocaleString('fr-FR') + ' ' + (v.currency||'FCFA');
+    return null;
 }
 
-window.rmFile = (btn, name) => {
-  uploadedFiles = uploadedFiles.filter(f => f.name !== name);
-  btn.parentElement.remove();
-  if (!uploadedFiles.length) zone.classList.remove('filled');
-};
-
-async function cloudinaryUpload(file, onProg) {
-  const fd = new FormData();
-  fd.append('file', file);
-  fd.append('upload_preset', CLOUD.preset);
-  return new Promise((res, rej) => {
-    const xhr = new XMLHttpRequest();
-    const t = file.type.startsWith('video/') ? 'video' : 'image';
-    xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD.name}/${t}/upload`);
-    xhr.upload.onprogress = e => { if (e.lengthComputable && onProg) onProg(Math.round(e.loaded/e.total*100)); };
-    xhr.onload = () => xhr.status===200 ? res({ url:JSON.parse(xhr.responseText).secure_url, type:file.type }) : rej(new Error('Upload échoué'));
-    xhr.onerror = () => rej(new Error('Erreur réseau'));
-    xhr.send(fd);
-  });
-}
-
-/* ── PUBLISH ── */
-window.publishVehicle = async () => {
-  const desc = document.getElementById('addDesc').value.trim();
-  if (!desc) { toast('error','Champ requis','La description est obligatoire'); return; }
-  const btn = document.getElementById('publishBtn');
-  const sp = document.getElementById('publishSpin');
-  const pb = document.getElementById('progBar');
-  const pf = document.getElementById('progFill');
-  btn.disabled=true; sp.classList.add('on');
-  pb.classList.add('show'); pf.style.width='0%';
-  try {
-    let images=[], videoUrl=null;
-    if (uploadedFiles.length) {
-      let done=0, total=uploadedFiles.length;
-      const results = await Promise.all(uploadedFiles.map(f =>
-        cloudinaryUpload(f, p => { pf.style.width=Math.round(((done+p/100)/total)*100)+'%'; })
-          .then(r => { done++; pf.style.width=Math.round(done/total*100)+'%'; return r; })
-      ));
-      images   = results.filter(u => u.type.startsWith('image/')).map(u => u.url);
-      videoUrl = results.find(u => u.type.startsWith('video/'))?.url||null;
-    }
-    const firstLine = desc.split('\n')[0].trim();
-    const name = firstLine.length>60 ? firstLine.slice(0,60)+'…' : firstLine;
-    const data = {
-      name, brand: firstLine.split(' ')[0]||'Véhicule',
-      description: desc,
-      negotiate: priceMode==='negocier',
-      premium: document.getElementById('addPremium').checked,
-      new: document.getElementById('addIsNew').checked,
-      available: document.getElementById('addAvail').checked,
-      imageUrl: images[0]||'',
-      images: images.length ? images : null,
-      hasVideo: !!videoUrl,
-      createdAt: Date.now()
-    };
-    if (priceMode==='mention') {
-      const p = parseInt(document.getElementById('addPrice').value)||null;
-      if (p) { data.price=p; data.currency=document.getElementById('addCurrency').value; }
-    }
-    if (videoUrl) data.videoUrl = videoUrl;
-    await set(push(ref(db,'vehicles')), data);
-    pf.style.width='100%';
-    toast('success','Publié !','Le véhicule est maintenant en ligne');
-    resetAddForm();
-    updateStats();
-  } catch(err) {
-    toast('error','Erreur', err.message);
-  } finally {
-    btn.disabled=false; sp.classList.remove('on');
-    setTimeout(()=>{ pb.classList.remove('show'); pf.style.width='0%'; }, 800);
-  }
-};
-
-/* ── VEHICLE ROW ── */
-function vehicleRow(key, v) {
-  const priceHtml = v.negotiate
-    ? `<span style="color:rgba(197,163,98,.5);font-size:.78rem">🤝 Négociable</span>`
-    : v.price ? `${v.price.toLocaleString('fr-FR')} <span style="font-size:.72rem;opacity:.65">${v.currency||'FCFA'}</span>`
-    : `<span style="color:var(--text-3)">—</span>`;
-  const d = document.createElement('div');
-  d.className = 'vlist-item';
-  d.innerHTML = `
-    <img src="${v.imageUrl||'https://placehold.co/60x44/1c1c20/c5a362?text=AUTO'}" class="v-thumb" alt="">
-    <div>
-      <div class="v-name">${v.name||'Véhicule'}</div>
-      <div class="v-meta">${v.premium?'⭐ ':''}${v.new?'🆕 ':''}Ajouté ${new Date(v.createdAt||Date.now()).toLocaleDateString('fr-FR')}</div>
-    </div>
-    <div class="v-price-col">${priceHtml}</div>
-    <div class="v-status-wrap">
-      <span class="v-status ${v.available?'avail':'unavail'}">${v.available?'Disponible':'Réservé'}</span>
-    </div>
-    <div class="v-actions">
-      <button class="icon-btn" onclick="openEdit('${key}')" title="Modifier">
-        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </button>
-      <button class="icon-btn del" onclick="deleteVehicle('${key}')" title="Supprimer">
-        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-      </button>
-    </div>`;
-  return d;
-}
-
-/* ── LOAD VEHICLES ── */
-window.loadVehicles = () => {
-  const list = document.getElementById('vehiclesList');
-  list.innerHTML = '<div class="empty-state"><p>Chargement…</p></div>';
-  onValue(ref(db,'vehicles'), snap => {
+/* ─── LOAD ─── */
+onValue(ref(db,'vehicles'), snap => {
     const data = snap.val();
+    const grid = document.getElementById('carsGrid');
     if (!data) {
-      list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/></svg><p>Aucun véhicule en stock</p></div>';
-      return;
+        grid.innerHTML = `<div class="empty-catalogue" style="grid-column:1/-1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 17h2c.6 0 1-.4 1-1v-4c0-.6-.4-1-1-1H3c-.6 0-1 .4-1 1v4c0 .6.4 1 1 1h2m16 0v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2m16 0H5"/></svg>
+            <p>Aucun véhicule disponible pour le moment.<br>Revenez bientôt !</p>
+        </div>`;
+        return;
     }
-    const header = document.createElement('div');
-    header.className='vlist-head';
-    header.innerHTML='<div></div><div>Véhicule</div><div class="col-price">Prix</div><div class="col-status">Statut</div><div></div>';
-    list.innerHTML='';
-    list.appendChild(header);
-    Object.keys(data).reverse().forEach(k => list.appendChild(vehicleRow(k, data[k])));
-  }, { onlyOnce:true });
-};
+    allVehicles = Object.entries(data).reverse().map(([id,v]) => ({...v, id}));
+    renderVehicles(allVehicles);
+}, { onlyOnce: false });
 
-function loadDashboard() {
-  const wrap = document.getElementById('dashboardVehicles');
-  wrap.innerHTML='<div class="empty-state"><p>Chargement…</p></div>';
-  onValue(ref(db,'vehicles'), snap => {
-    const data = snap.val();
-    if (!data) { wrap.innerHTML='<div class="empty-state"><p>Aucun véhicule</p></div>'; return; }
-    const header = document.createElement('div');
-    header.className='vlist-head';
-    header.innerHTML='<div></div><div>Véhicule</div><div class="col-price">Prix</div><div class="col-status">Statut</div><div></div>';
-    wrap.innerHTML='';
-    wrap.appendChild(header);
-    Object.keys(data).reverse().slice(0,5).forEach(k => wrap.appendChild(vehicleRow(k, data[k])));
-  }, { onlyOnce:true });
+function renderVehicles(list) {
+    const grid = document.getElementById('carsGrid');
+    if (list.length === 0) {
+        grid.innerHTML = `<div class="empty-catalogue" style="grid-column:1/-1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01"/></svg>
+            <p>Aucun véhicule dans cette catégorie.</p>
+        </div>`;
+        return;
+    }
+    grid.innerHTML = '';
+    list.forEach(v => grid.appendChild(buildCard(v)));
 }
 
-/* ── DELETE ── */
-window.deleteVehicle = id => {
-  if (!confirm('Supprimer ce véhicule définitivement ?')) return;
-  remove(ref(db,'vehicles/'+id))
-    .then(()=>{ toast('success','Supprimé','Véhicule retiré'); loadVehicles(); loadDashboard(); updateStats(); })
-    .catch(e=>toast('error','Erreur',e.message));
-};
+function buildCard(v) {
+    const card = document.createElement('div');
+    card.className = 'car-card';
 
-/* ── EDIT ── */
-let currentEditId = null;
-window.openEdit = id => {
-  currentEditId = id;
-  onValue(ref(db,'vehicles/'+id), snap => {
-    const v = snap.val(); if (!v) return;
-    document.getElementById('editDesc').value = v.description||'';
-    document.getElementById('editPremium').checked = !!v.premium;
-    document.getElementById('editIsNew').checked = !!v.new;
-    document.getElementById('editAvail').checked = !!v.available;
-    if (v.negotiate) { setEditPriceMode('negocier'); }
-    else {
-      setEditPriceMode('mention');
-      document.getElementById('editPrice').value = v.price||'';
-      document.getElementById('editCurrency').value = v.currency||'FCFA';
-    }
-    document.getElementById('editModal').classList.add('open');
-    document.body.style.overflow='hidden';
-  }, { onlyOnce:true });
-};
+    const label = priceLabel(v);
+    const priceHtml = label
+        ? `<div class="car-price">${label}</div>`
+        : `<div class="car-price negotiate">🤝 <span>Prix à négocier — contactez-nous</span></div>`;
 
-window.closeEdit = () => {
-  document.getElementById('editModal').classList.remove('open');
-  document.body.style.overflow='';
-  currentEditId=null; editPriceMode='mention';
-};
+    const badges = [
+        v.premium ? `<span class="badge badge-or">Premium</span>` : '',
+        v.new      ? `<span class="badge badge-new">Nouveau</span>` : '',
+        v.available === false ? `<span class="badge badge-res">Réservé</span>` : ''
+    ].join('');
 
-window.saveEdit = async () => {
-  if (!currentEditId) return;
-  const btn = document.getElementById('saveEditBtn');
-  const sp = document.getElementById('saveSpin');
-  btn.disabled=true; sp.classList.add('on');
-  try {
-    const desc = document.getElementById('editDesc').value.trim();
-    const firstLine = desc.split('\n')[0].trim();
-    const updates = {
-      description: desc,
-      name: firstLine.length>60 ? firstLine.slice(0,60)+'…' : firstLine,
-      brand: firstLine.split(' ')[0]||'Véhicule',
-      premium: document.getElementById('editPremium').checked,
-      new: document.getElementById('editIsNew').checked,
-      available: document.getElementById('editAvail').checked,
-      negotiate: editPriceMode==='negocier',
-      updatedAt: Date.now()
+    card.innerHTML = `
+        <div class="car-img">
+            <img src="${v.imageUrl||'https://via.placeholder.com/400x250/1a1a1a/c9a961?text=LUXE+AUTO'}" alt="${v.name}" loading="lazy">
+            <div class="car-badges">${badges}</div>
+        </div>
+        <div class="car-body">
+            <h3 class="car-name">${v.name||'Véhicule'}</h3>
+            <p class="car-desc">${v.description||''}</p>
+            ${priceHtml}
+            <div class="car-actions">
+                <button class="car-detail-btn" onclick="openDetail('${v.id}')">Voir les détails</button>
+                <button class="car-wa-btn" onclick="waFromCard('${v.id}')" title="WhatsApp">
+                    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                </button>
+            </div>
+        </div>`;
+    return card;
+}
+
+/* ─── FILTER ─── */
+window.filterVehicles = function(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const map = {
+        all: () => allVehicles,
+        available: () => allVehicles.filter(v => v.available !== false),
+        premium: () => allVehicles.filter(v => v.premium),
+        new: () => allVehicles.filter(v => v.new)
     };
-    if (editPriceMode==='mention') {
-      const p = parseInt(document.getElementById('editPrice').value)||null;
-      updates.price=p; updates.currency=p?document.getElementById('editCurrency').value:null;
-    } else { updates.price=null; updates.currency=null; }
-    const existing = await new Promise(r => onValue(ref(db,'vehicles/'+currentEditId), s=>r(s.val()), {onlyOnce:true}));
-    await set(ref(db,'vehicles/'+currentEditId), Object.assign({},existing,updates));
-    toast('success','Modifié !','Les changements ont été enregistrés');
-    closeEdit(); loadVehicles(); loadDashboard();
-  } catch(err) { toast('error','Erreur',err.message); }
-  finally { btn.disabled=false; sp.classList.remove('on'); }
+    renderVehicles((map[type]||map.all)());
 };
 
-/* ── STATS ── */
-function updateStats() {
-  onValue(ref(db,'vehicles'), snap => {
-    const count = snap.size||0;
-    document.getElementById('statTotal').textContent = count;
-    document.getElementById('navBadge').textContent = count;
-    document.getElementById('stockLabel').textContent = `Stock (${count})`;
-  }, { onlyOnce:true });
+/* ─── MODAL ─── */
+window.openDetail = function(id) {
+    const v = allVehicles.find(x => x.id === id);
+    if (!v) return;
+
+    currentVehicle = v;
+    vehicleImages  = (v.images && v.images.length > 0) ? v.images : [v.imageUrl||''];
+    imgIndex = 0;
+
+    document.getElementById('modalTitle').textContent  = v.name||'';
+    document.getElementById('modalBrand').textContent  = v.brand||'Luxe Auto';
+
+    // PRIX
+    const label = priceLabel(v);
+    const pw = document.getElementById('modalPriceWrap');
+    if (label) {
+        pw.innerHTML = `<div class="modal-price">${label}</div>`;
+    } else {
+        pw.innerHTML = `
+            <div class="modal-price negotiate">🤝 Prix à négocier</div>
+            <div class="modal-price-hint">Contactez-nous en inbox pour connaître le prix de ce véhicule.</div>`;
+    }
+
+    // SPECS
+    const specs = [];
+    if (v.year)   specs.push(`<div class="spec"><div class="spec-lbl">Année</div><div class="spec-val">${v.year}</div></div>`);
+    if (v.mileage > 0) specs.push(`<div class="spec"><div class="spec-lbl">Kilométrage</div><div class="spec-val">${v.mileage.toLocaleString('fr-FR')} km</div></div>`);
+    if (v.power)  specs.push(`<div class="spec"><div class="spec-lbl">Puissance</div><div class="spec-val">${v.power}</div></div>`);
+    if (v.fuel)   specs.push(`<div class="spec"><div class="spec-lbl">Carburant</div><div class="spec-val">${v.fuel}</div></div>`);
+    if (v.transmission) specs.push(`<div class="spec"><div class="spec-lbl">Boîte</div><div class="spec-val">${v.transmission}</div></div>`);
+    specs.push(`<div class="spec"><div class="spec-lbl">Statut</div><div class="spec-val" style="color:${v.available!==false?'#4caf50':'#c41e3a'}">${v.available!==false?'Disponible':'Réservé'}</div></div>`);
+    document.getElementById('modalSpecs').innerHTML = specs.join('');
+
+    document.getElementById('modalDesc').textContent = v.description||'';
+
+    updateGallery();
+
+    const modal = document.getElementById('vehicleModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    setupSwipe();
+};
+
+window.closeModal = function() {
+    document.getElementById('vehicleModal').classList.remove('active');
+    document.body.style.overflow = '';
+};
+
+window.closeModalBg = function(e) {
+    if (e.target === e.currentTarget) closeModal();
+};
+
+window.changeImg = function(dir) {
+    imgIndex = (imgIndex + dir + vehicleImages.length) % vehicleImages.length;
+    updateGallery();
+};
+
+window.setImg = function(i) { imgIndex = i; updateGallery(); };
+
+function updateGallery() {
+    document.getElementById('modalMainImg').src = vehicleImages[imgIndex]||'';
+    document.getElementById('galleryCounter').textContent = `${imgIndex+1} / ${vehicleImages.length}`;
+    document.getElementById('galleryThumbs').innerHTML = vehicleImages.map((src,i) =>
+        `<img src="${src}" class="gallery-thumb ${i===imgIndex?'active':''}" onclick="setImg(${i})" loading="lazy">`
+    ).join('');
 }
 
-/* ── INIT ── */
-updateStats();
-loadDashboard();
+function setupSwipe() {
+    const g = document.getElementById('modalGallery');
+    g.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive:true});
+    g.addEventListener('touchend',   e => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (Math.abs(touchStartX - touchEndX) > 50) changeImg(touchStartX > touchEndX ? 1 : -1);
+    }, {passive:true});
+}
+
+/* ─── WHATSAPP ─── */
+const PHONE = '2250172369840';
+
+function sendWA(v) {
+    const label = priceLabel(v);
+    const priceText = label ? label : 'À négocier (contactez-nous en inbox)';
+    const msg = `Bonjour, je suis intéressé par ce véhicule :\n\n` +
+                `🚗 *${v.name||''}*\n` +
+                `💰 Prix : ${priceText}\n\n` +
+                (v.description ? `📋 ${v.description.substring(0,300)}${v.description.length>300?'…':''}\n\n` : '') +
+                `Pouvez-vous me donner plus d'informations ? Merci.`;
+    window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+window.waFromModal = function() { if (currentVehicle) sendWA(currentVehicle); };
+window.waFromCard  = function(id) {
+    const v = allVehicles.find(x => x.id === id);
+    if (v) sendWA(v);
+};
+
+/* ─── TESTIMONIALS ─── */
+let testiIdx = 0;
+window.showTesti = function(i) {
+    document.querySelectorAll('.testi').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.testi-dot').forEach(d => d.classList.remove('active'));
+    document.querySelectorAll('.testi')[i].classList.add('active');
+    document.querySelectorAll('.testi-dot')[i].classList.add('active');
+    testiIdx = i;
+};
+setInterval(() => showTesti((testiIdx+1)%3), 5000);
+
+/* ─── NAV ─── */
+window.toggleMenu = function() {
+    document.getElementById('nav').classList.toggle('active');
+    document.getElementById('mobBtn').classList.toggle('active');
+};
+window.closeMenu = function() {
+    document.getElementById('nav').classList.remove('active');
+    document.getElementById('mobBtn').classList.remove('active');
+};
+
+/* ─── LOADER ─── */
+window.addEventListener('load', () => setTimeout(() => document.getElementById('loader').classList.add('hidden'), 1400));
+
+/* ─── INTERSECTION OBSERVER ─── */
+const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold:.1 });
+document.querySelectorAll('.svc-card').forEach(c => obs.observe(c));
 </script>
 </body>
 </html>
